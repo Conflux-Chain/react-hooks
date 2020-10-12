@@ -1,6 +1,6 @@
 {
   "name": "@cfxjs/react-hooks",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "react hooks to interact with conflux network",
   "main": "index.js",
   "author": "yqrashawn <namy.19@gmail.com>",
@@ -39,8 +39,14 @@
       "master",
       "next",
       "next-major",
-      { "name": "beta", "prerelease": true },
-      { "name": "alpha", "prerelease": true }
+      {
+        "name": "beta",
+        "prerelease": true
+      },
+      {
+        "name": "alpha",
+        "prerelease": true
+      }
     ]
   },
   "publishConfig": {

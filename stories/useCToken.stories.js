@@ -44,7 +44,7 @@ const UseCTokenTemplateSimulation = () => {
       <p>Ref token address: {refTokenAddr}</p>
       <p>Ref token decimal: {refTokenDecimal}</p>
       <button disabled={burnning} onClick={shuttleout}>
-        burn
+        Burn (shuttle out)
       </button>
       <p>Burnning: {burnning.toString()}</p>
       <p>Burn tx addr: {JSON.stringify(burnRst)}</p>
