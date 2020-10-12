@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 import {
   useEpochNumber,
   initContract,
@@ -9,59 +9,67 @@ import abi from "./contracts/TokenBase.json";
 import cuabi from "./contracts/CustodianImpl.json";
 import useSWR from "./swr";
 
+const c = initContract({ abi });
 const cu = initContract({ abi: cuabi });
 
-// contractAddress: ctoken address
-function useCToken(contractAddress, custodianContractAddress) {
-  const c = initContract({ abi });
-  c.address = contractAddress;
-  const { address: userAddress } = useConfluxPortal();
+// contractAddr: ctoken address
+function useCToken(contractAddr, custodianContractAddr) {
+  const { address: userAddr } = useConfluxPortal();
   const [epochNumber] = useEpochNumber();
   const [totalSupply, setTotalSupply] = useState(0);
   const [balance, setBalance] = useState(0);
 
   useEffect(() => {
-    if (contractAddress)
-      c.totalSupply().call({ to: contractAddress }).then(setTotalSupply);
-  }, [contractAddress, epochNumber]);
+    if (contractAddr)
+      c.totalSupply().call({ to: contractAddr }).then(setTotalSupply);
+  }, [contractAddr, epochNumber]);
 
   useEffect(() => {
-    if (userAddress)
-      c.balanceOf(userAddress).call({ to: contractAddress }).then(setBalance);
-  }, [userAddress, contractAddress, epochNumber]);
+    if (userAddr)
+      c.balanceOf(userAddr).call({ to: contractAddr }).then(setBalance);
+  }, [userAddr, contractAddr, epochNumber]);
 
   const {
-    data: refTokenAddress,
-    error: refTokenAddressError,
+    data: refTokenAddr,
+    error: refTokenAddrError,
   } = useSWR(
-    custodianContractAddress && contractAddress
-      ? `${custodianContractAddress}-token_reference-${contractAddress}`
+    custodianContractAddr && contractAddr
+      ? `${custodianContractAddr}-token_reference-${contractAddr}`
       : null,
-    () =>
-      cu.token_reference(contractAddress).call({ to: custodianContractAddress })
+    () => cu.token_reference(contractAddr).call({ to: custodianContractAddr })
   );
-  if (refTokenAddressError)
-    console.error(`[refTokenAddressError]: ${refTokenAddressError?.message}`);
+  if (refTokenAddrError)
+    console.error(`[refTokenAddrError]: ${refTokenAddrError?.message}`);
 
   const {
     data: refTokenDecimal,
     error: refTokenDecimalError,
   } = useSWR(
-    custodianContractAddress && contractAddress
-      ? `${custodianContractAddress}-token_decimals-${contractAddress}`
+    custodianContractAddr && contractAddr
+      ? `${custodianContractAddr}-token_decimals-${contractAddr}`
       : null,
-    () =>
-      cu.token_decimals(contractAddress).call({ to: custodianContractAddress })
+    () => cu.token_decimals(contractAddr).call({ to: custodianContractAddr })
   );
 
   if (refTokenDecimalError)
     console.error(`[refTokenDecimalError]: ${refTokenDecimalError?.message}`);
 
+  const burn = (
+    amount,
+    expectedFee,
+    externalAddr,
+    defiRelayer = "0x0000000000000000000000000000000000000000"
+  ) => {
+    return c
+      .burn(userAddr, amount, expectedFee, externalAddr, defiRelayer)
+      .sendTransaction({ from: userAddr, to: contractAddr });
+  };
+
   return {
     totalSupply,
     balance,
-    burn: c.burn,
-    refTokenAddress,
+    burn,
+    refTokenAddr,
     refTokenDecimal,
   };
 }
@@ -69,7 +77,7 @@ function useCToken(contractAddress, custodianContractAddress) {
 export default wrapIsPortalInstalled(useCToken, {
   totalSupply: 0,
   balance: 0,
-  refTokenAddress: "",
+  refTokenAddr: "",
   refTokenDecimal: 0,
   burn: () => {},
 });

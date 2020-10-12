@@ -20,11 +20,11 @@ const singleCallBalanceContract = initContract({
   address: "0x8f35930629fce5b5cf4cd762e71006045bfeb24d",
 });
 
-function getTokensBalance(address, tokenAddresses) {
+function getTokensBalance(address, tokenAddr) {
   return singleCallBalanceContract
     .balances(
       [address],
-      ["0x0000000000000000000000000000000000000000", ...tokenAddresses]
+      ["0x0000000000000000000000000000000000000000", ...tokenAddr]
     )
     .call();
 }
@@ -37,7 +37,7 @@ export function wrapIsPortalInstalled(installed, notInstalled) {
   }
 }
 
-function useConfluxPortal(tokenAddresses = []) {
+function useConfluxPortal(tokenAddr = []) {
   window.conflux.autoRefreshOnNetworkChange = false;
 
   // eslint-disable-next-line react-hooks/rules-of-hooks
@@ -75,9 +75,9 @@ function useConfluxPortal(tokenAddresses = []) {
   // eslint-disable-next-line react-hooks/rules-of-hooks
   useEffect(() => {
     if (address && singleCallBalanceContract) {
-      getTokensBalance(address, tokenAddresses).then(setTokensBalance);
+      getTokensBalance(address, tokenAddr).then(setTokensBalance);
     }
-  }, [address, JSON.stringify(tokenAddresses), epochNumber]);
+  }, [address, JSON.stringify(tokenAddr), epochNumber]);
 
   // eslint-disable-next-line react-hooks/rules-of-hooks
   useEffect(() => {

@@ -7,41 +7,108 @@ import {
 } from "../";
 import abi from "./contracts/CustodianImpl.json";
 
-// contractAddress: ctoken address
-function useCustodian(contractAddress, getTokenList = false) {
-  const c = initContract({ abi });
-  c.address = contractAddress;
-  // const { address: userAddress } = useConfluxPortal();
+const c = initContract({ abi });
+
+// contractAddr: ctoken address
+function useCustodian(contractAddr, getTokenList = false) {
+  const { address: userAddr } = useConfluxPortal();
   const [epochNumber] = useEpochNumber();
   const [tokenList, setTokenList] = useState(0);
 
   useEffect(() => {
     if (getTokenList) c.tokenList().then(setTokenList);
-  }, [contractAddress, epochNumber, getTokenList]);
+  }, [contractAddr, epochNumber, getTokenList]);
 
-  // cTokenAddressToRefTokenAddress may return 'eth', 'btc', normal address like '0xdac17f958d2ee523a2206206994597c13d831ec7'
+  // cTokenAddrToRefTokenAddr may return 'eth', 'btc', normal address like '0xdac17f958d2ee523a2206206994597c13d831ec7'
   return {
     tokenList,
-    cTokenAddressToRefTokenAddress: c.token_reference,
-    cTokenAddressToRefTokenDeicmals: c.token_decimals,
-    isRefTokenAdminToken: c.admin_token,
-    refTokenBurnFee: c.burn_fee,
-    refTokenMintFee: c.mint_fee,
-    refTokenWalletFee: c.wallet_fee,
-    refTokenMinMintValue: c.minimal_mint_value,
-    btcMinMintValue: c.btc_minimal_mint_value,
-    refTokenMinBurnValue: c.minimal_burn_value,
-    btcMinBurnValue: c.btc_minimal_burn_value,
-    minSponsorCETH: c.minimal_sponsor_amount,
-    sponsorAToken: c.sponsorToken,
-    setTokenParams: c.setTokenParams,
+    cTokenAddrToRefTokenAddr: (cAddr) =>
+      c.token_reference(cAddr).call({ to: contractAddr }),
+    cTokenAddrToRefTokenDeicmals: (cAddr) =>
+      c.token_decimals(cAddr).call({ to: contractAddr }),
+    isRefTokenAdminToken: (refAddr) =>
+      c.admin_token(refAddr).call({ to: contractAddr }),
+    refTokenBurnFee: (refAddr) =>
+      c.burn_fee(refAddr).call({ to: contractAddr }),
+    refTokenMintFee: (refAddr) =>
+      c.mint_fee(refAddr).call({ to: contractAddr }),
+    refTokenWalletFee: (refAddr) =>
+      c.wallet_fee(refAddr).call({ to: contractAddr }),
+    refTokenMinMintValue: (refAddr) =>
+      c.minimal_mint_value(refAddr).call({ to: contractAddr }),
+    btcMinMintValue: () =>
+      c.btc_minimal_mint_value().call({ to: contractAddr }),
+    refTokenMinBurnValue: (refAddr) =>
+      c.minimal_burn_value(refAddr).call({ to: contractAddr }),
+    btcMinBurnValue: () =>
+      c.btc_minimal_burn_value().call({ to: contractAddr }),
+    minSponsorCETH: () => c.minimal_sponsor_amount().call({ to: contractAddr }),
+    /*
+      function sponsorToken(
+      string memory ref, // lowercase erc20 ethereum address
+      uint256 amount, // amount of cETH mortgaged
+      uint256 _burn_fee, // burn fee of erc20 token, in erc20 decimals
+      uint256 _mint_fee, // mint fee of erc20 token, in erc20 decimals
+      uint256 _wallet_fee, // receive wallet fee of erc20 token, in erc20 decimals
+      uint256 _minimal_mint_value, // minimal mint value of erc20 token, in erc20 decimals
+      uint256 _minimal_burn_value // minimal burn value of erc20 token, in erc20 decimals
+      ) public;
+    */
+    sponsorAToken: (
+      refAddr,
+      amount,
+      burnFee,
+      mintFee,
+      walletFee,
+      minimalMintValue,
+      minimalBurnValue
+    ) =>
+      c
+        .sponsorToken(
+          refAddr,
+          amount,
+          burnFee,
+          mintFee,
+          walletFee,
+          minimalMintValue,
+          minimalBurnValue
+        )
+        .sendTransaction({ from: userAddr, to: contractAddr }),
+    /*
+      function setTokenParams(
+      string memory ref, // lowercase erc20 ethereum address
+      uint256 _burn_fee,
+      uint256 _mint_fee,
+      uint256 _wallet_fee,
+      uint256 _minimal_mint_value,
+      uint256 _minimal_burn_value
+      ) public;
+      */
+    setTokenParams: (
+      refAddr,
+      burnFee,
+      mintFee,
+      walletFee,
+      minimalMintValue,
+      minimalBurnValue
+    ) =>
+      c
+        .setTokenParams(
+          refAddr,
+          burnFee,
+          mintFee,
+          walletFee,
+          minimalMintValue,
+          minimalBurnValue
+        )
+        .sendTransaction({ from: userAddr, to: contractAddr }),
   };
 }
 
 export default wrapIsPortalInstalled(useCustodian, {
   tokenList: [],
-  cTokenAddressToRefTokenAddress: () => {},
-  cTokenAddressToRefTokenDeicmals: () => {},
+  cTokenAddrToRefTokenAddr: () => {},
+  cTokenAddrToRefTokenDeicmals: () => {},
   isRefTokenAdminToken: () => {},
   refTokenBurnFee: () => {},
   refTokenMintFee: () => {},
