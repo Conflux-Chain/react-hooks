@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import SINGLE_CALL_BALANCES_ABI from "./contracts/cfx-single-call-balance-checker-abi.json";
-import { useDebounce } from "react-use";
+import { useEffectOnce } from "react-use";
 import useSWR from "./swr";
 import useEpochNumber from "./useEpochNumber";
 import initContract from "./initContract";
@@ -68,9 +68,10 @@ function useConfluxPortal(tokenAddr = []) {
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const [epochNumber] = useEpochNumber();
 
-  const useEnsurePortalLogin = () =>
+  const useEnsurePortalLogin = () => {
     // eslint-disable-next-line react-hooks/rules-of-hooks
-    useDebounce(login, 400, []);
+    useEffectOnce(login);
+  };
 
   // eslint-disable-next-line react-hooks/rules-of-hooks
   useEffect(() => {
