@@ -1,23 +1,21 @@
-import { useState, useEffect } from "react";
-import {
-  useEpochNumber,
-  initContract,
-  wrapIsPortalInstalled,
-  // useConfluxPortal,
-} from "../";
+import { initContract, wrapIsPortalInstalled, useConfluxPortal } from "../";
 import abi from "./contracts/CustodianImpl.json";
+import { useEpochNumberSWR } from "./swr";
 
 const c = initContract({ abi });
+const CUSTODIAN_TOKEN_LIST_SWR_ID = "CUSTODIAN_TOKEN_LIST_SWR_ID";
 
 // contractAddr: ctoken address
 function useCustodian(contractAddr, getTokenList = false) {
   const { address: userAddr } = useConfluxPortal();
-  const [epochNumber] = useEpochNumber();
-  const [tokenList, setTokenList] = useState(0);
 
-  useEffect(() => {
-    if (getTokenList) c.tokenList().then(setTokenList);
-  }, [contractAddr, epochNumber, getTokenList]);
+  const { data: tokenList, error: tokenListErr } = useEpochNumberSWR(
+    getTokenList ? [CUSTODIAN_TOKEN_LIST_SWR_ID, contractAddr] : null,
+    c.tokenList()
+  );
+
+  if (tokenListErr)
+    console.error(`Error get tokenList: ${tokenListErr?.message}`);
 
   // cTokenAddrToRefTokenAddr may return 'eth', 'btc', normal address like '0xdac17f958d2ee523a2206206994597c13d831ec7'
   return {

@@ -1,6 +1,6 @@
 import React from "react";
 import useConfluxPortal from "../src/useConfluxPortal";
-import useEpochNumber from "../src/useEpochNumber";
+import { useEpochNumber } from "../src/useEpochNumber";
 
 export default {
   title: "General",
@@ -48,7 +48,7 @@ const UseConfluxPortalTemplate = () => {
 export const UseConfluxPortal = UseConfluxPortalTemplate.bind({});
 
 const UseEpochNumberTemplate = () => {
-  const [epochNumber] = useEpochNumber();
+  const epochNumber = useEpochNumber();
 
   return (
     <>

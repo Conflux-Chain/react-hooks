@@ -1,11 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import SINGLE_CALL_BALANCES_ABI from "./contracts/cfx-single-call-balance-checker-abi.json";
 import { useEffectOnce } from "react-use";
-import useSWR from "./swr";
-import useEpochNumber from "./useEpochNumber";
+import { useSWR, useEpochNumberSWR } from "../";
 import initContract from "./initContract";
 
-const UPDATE_CHAINID_SWR_ID = "UPDATE_CHAINID_SWR_ID";
+export const UPDATE_CHAINID_SWR_ID = "UPDATE_CHAINID_SWR_ID";
+export const UPDATE_USER_BALANCE_SWR_ID = "UPDATE_USER_BALANCE_SWR_ID";
 
 function openHomePage() {
   window.open("https://portal.conflux-chain.org");
@@ -40,20 +40,14 @@ export function wrapIsPortalInstalled(installed, notInstalled) {
 function useConfluxPortal(tokenAddr = []) {
   window.conflux.autoRefreshOnNetworkChange = false;
 
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   const [address, setAddress] = useState(window.conflux.selectedAddress);
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   const [chainId, setChainId] = useState(window.conflux.chainId);
 
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   const { data: swrChainId } = useSWR(UPDATE_CHAINID_SWR_ID, async () =>
     window.conflux.chainId === "loading" ? null : window.conflux.chainId
   );
 
   if (swrChainId !== chainId) setChainId(swrChainId);
-
-  // eslint-disable-next-line react-hooks/rules-of-hooks
-  const [[balance, ...tokenBalances], setTokensBalance] = useState([0, []]);
 
   const login = () => {
     if (!address) {
@@ -65,23 +59,26 @@ function useConfluxPortal(tokenAddr = []) {
     }
   };
 
-  // eslint-disable-next-line react-hooks/rules-of-hooks
-  const [epochNumber] = useEpochNumber();
-
   const useEnsurePortalLogin = () => {
     // eslint-disable-next-line react-hooks/rules-of-hooks
     useEffectOnce(login);
   };
 
-  // eslint-disable-next-line react-hooks/rules-of-hooks
-  useEffect(() => {
-    if (address && singleCallBalanceContract) {
-      getTokensBalance(address, tokenAddr).then(setTokensBalance);
-    }
-  }, [address, JSON.stringify(tokenAddr), epochNumber]);
+  const {
+    data: [balance, ...tokenBalances],
+    error: balanceErr,
+  } = useEpochNumberSWR(
+    address && singleCallBalanceContract
+      ? [UPDATE_USER_BALANCE_SWR_ID, address, tokenAddr.toString()]
+      : null,
+    () => getTokensBalance(address, tokenAddr),
+    { initialData: [0, ...tokenAddr.map(() => 0)] }
+  );
+
+  if (balanceErr) console.error(`Get Balance Error: ${balanceErr?.message}`);
 
   // eslint-disable-next-line react-hooks/rules-of-hooks
-  useEffect(() => {
+  useEffectOnce(() => {
     const accountListener = (newAccounts) => {
       if (validAddresses(newAccounts)) {
         setAddress(newAccounts[0]);
@@ -100,7 +97,7 @@ function useConfluxPortal(tokenAddr = []) {
         window.conflux.off("networkChanged", networkListener);
       }
     };
-  }, []);
+  });
 
   return {
     portalInstalled: true,

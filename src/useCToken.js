@@ -1,40 +1,42 @@
-import { useState, useEffect } from "react";
-import {
-  useEpochNumber,
-  initContract,
-  wrapIsPortalInstalled,
-  useConfluxPortal,
-} from "../";
+import { initContract, wrapIsPortalInstalled, useConfluxPortal } from "../";
 import abi from "./contracts/TokenBase.json";
 import cuabi from "./contracts/CustodianImpl.json";
-import useSWR from "./swr";
+import useSWR, { useEpochNumberSWR } from "./swr";
 
+export const CTOKEN_TOTAL_SUPPLY_SWR_ID = "CTOKEN_TOTAL_SUPPLY_SWR_ID";
+export const CTOKEN_BALANCE_SWR_ID = "CTOKEN_BALANCE_SWR_ID";
+export const CTOKEN_TO_REF_TOKEN_ADDR_SWR_ID =
+  "CTOKEN_TO_REF_TOKEN_ADDR_SWR_ID";
+export const CTOKEN_TO_REF_TOKEN_DECIMALS_SWR_ID =
+  "CTOKEN_TO_REF_TOKEN_DECIMALS_SWR_ID";
 const c = initContract({ abi });
 const cu = initContract({ abi: cuabi });
 
 // contractAddr: ctoken address
 function useCToken(contractAddr, custodianContractAddr) {
   const { address: userAddr } = useConfluxPortal();
-  const [epochNumber] = useEpochNumber();
-  const [totalSupply, setTotalSupply] = useState(0);
-  const [balance, setBalance] = useState(0);
 
-  useEffect(() => {
-    if (contractAddr)
-      c.totalSupply().call({ to: contractAddr }).then(setTotalSupply);
-  }, [contractAddr, epochNumber]);
+  const { data: totalSupply, totalSupplyErr } = useEpochNumberSWR(
+    contractAddr ? [CTOKEN_TOTAL_SUPPLY_SWR_ID, contractAddr] : null,
+    () => c.totalSupply().call({ to: contractAddr })
+  );
 
-  useEffect(() => {
-    if (userAddr)
-      c.balanceOf(userAddr).call({ to: contractAddr }).then(setBalance);
-  }, [userAddr, contractAddr, epochNumber]);
+  if (totalSupplyErr)
+    console.error(`Error get totalSupply: ${totalSupplyErr?.message}`);
+
+  const { data: balance, balanceErr } = useEpochNumberSWR(
+    contractAddr ? [CTOKEN_BALANCE_SWR_ID, contractAddr, userAddr] : null,
+    () => c.balanceOf(userAddr).call({ to: contractAddr })
+  );
+
+  if (balanceErr) console.error(`Error get balance: ${balanceErr?.message}`);
 
   const {
     data: refTokenAddr,
     error: refTokenAddrError,
   } = useSWR(
     custodianContractAddr && contractAddr
-      ? `${custodianContractAddr}-token_reference-${contractAddr}`
+      ? [CTOKEN_TO_REF_TOKEN_ADDR_SWR_ID, custodianContractAddr, contractAddr]
       : null,
     () => cu.token_reference(contractAddr).call({ to: custodianContractAddr })
   );
@@ -46,7 +48,11 @@ function useCToken(contractAddr, custodianContractAddr) {
     error: refTokenDecimalError,
   } = useSWR(
     custodianContractAddr && contractAddr
-      ? `${custodianContractAddr}-token_decimals-${contractAddr}`
+      ? [
+          CTOKEN_TO_REF_TOKEN_DECIMALS_SWR_ID,
+          custodianContractAddr,
+          contractAddr,
+        ]
       : null,
     () => cu.token_decimals(contractAddr).call({ to: custodianContractAddr })
   );
