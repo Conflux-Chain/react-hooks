@@ -75,7 +75,7 @@ function useConfluxPortal(tokenAddr = []) {
     { initialData: [0, ...tokenAddr.map(() => 0)] }
   );
 
-  if (balanceErr) console.error(`Get Balance Error: ${balanceErr?.message}`);
+  if (balanceErr) console.error(`Get Balance Error: ${balanceErr.message}`);
 
   // eslint-disable-next-line react-hooks/rules-of-hooks
   useEffectOnce(() => {

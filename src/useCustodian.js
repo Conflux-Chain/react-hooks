@@ -15,7 +15,7 @@ function useCustodian(contractAddr, getTokenList = false) {
   );
 
   if (tokenListErr)
-    console.error(`Error get tokenList: ${tokenListErr?.message}`);
+    console.error(`Error get tokenList: ${tokenListErr.message}`);
 
   // cTokenAddrToRefTokenAddr may return 'eth', 'btc', normal address like '0xdac17f958d2ee523a2206206994597c13d831ec7'
   return {

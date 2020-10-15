@@ -10,6 +10,7 @@ import {
 export { useEpochNumber, useEpochNumberFn };
 export { default as useSWR, useEpochNumberSWR } from "./src/swr";
 export { default as initContract } from "./src/initContract";
-export * as shuttleFlow from "./shuttleflow";
+import * as shuttleFlow from "./shuttleflow";
+export { shuttleFlow };
 
 setupEpochListener();

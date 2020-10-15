@@ -22,14 +22,14 @@ function useCToken(contractAddr, custodianContractAddr) {
   );
 
   if (totalSupplyErr)
-    console.error(`Error get totalSupply: ${totalSupplyErr?.message}`);
+    console.error(`Error get totalSupply: ${totalSupplyErr.message}`);
 
   const { data: balance, balanceErr } = useEpochNumberSWR(
     contractAddr ? [CTOKEN_BALANCE_SWR_ID, contractAddr, userAddr] : null,
     () => c.balanceOf(userAddr).call({ to: contractAddr })
   );
 
-  if (balanceErr) console.error(`Error get balance: ${balanceErr?.message}`);
+  if (balanceErr) console.error(`Error get balance: ${balanceErr.message}`);
 
   const {
     data: refTokenAddr,
@@ -41,7 +41,7 @@ function useCToken(contractAddr, custodianContractAddr) {
     () => cu.token_reference(contractAddr).call({ to: custodianContractAddr })
   );
   if (refTokenAddrError)
-    console.error(`[refTokenAddrError]: ${refTokenAddrError?.message}`);
+    console.error(`[refTokenAddrError]: ${refTokenAddrError.message}`);
 
   const {
     data: refTokenDecimal,
@@ -58,7 +58,7 @@ function useCToken(contractAddr, custodianContractAddr) {
   );
 
   if (refTokenDecimalError)
-    console.error(`[refTokenDecimalError]: ${refTokenDecimalError?.message}`);
+    console.error(`[refTokenDecimalError]: ${refTokenDecimalError.message}`);
 
   const burn = (
     amount,

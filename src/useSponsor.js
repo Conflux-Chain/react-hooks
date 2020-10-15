@@ -22,7 +22,7 @@ function useSponsor(contractAddr, tokenAddr) {
   );
 
   if (sponsorAddrError)
-    console.error("Get sponsorAddr err: ${sponsorAddrError?.message}");
+    console.error("Get sponsorAddr err: ${sponsorAddrError.message}");
 
   const {
     data: mortagedCETH,
@@ -35,7 +35,7 @@ function useSponsor(contractAddr, tokenAddr) {
   );
 
   if (mortagedCETHError)
-    console.error("Get mortagedCETH err: ${mortagedCETHError?.message}");
+    console.error("Get mortagedCETH err: ${mortagedCETHError.message}");
 
   const {
     data: sponsorReplaceRatio,
@@ -47,7 +47,7 @@ function useSponsor(contractAddr, tokenAddr) {
 
   if (sponsorReplaceRatioError)
     console.error(
-      "Get sponsorReplaceRatio err: ${sponsorReplaceRatioError?.message}"
+      "Get sponsorReplaceRatio err: ${sponsorReplaceRatioError.message}"
     );
 
   return { sponsorAddr, mortagedCETH, sponsorReplaceRatio };

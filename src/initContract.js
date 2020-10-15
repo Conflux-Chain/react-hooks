@@ -1,3 +1,4 @@
 export default function initContract(params) {
-  return window?.confluxJS?.Contract(params)
+  if (window && window.confluxJS && window.confluxJS.Contract)
+    return window.confluxJS.Contract(params);
 }
