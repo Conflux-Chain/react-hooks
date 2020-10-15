@@ -1,17 +1,40 @@
-import { initContract, wrapIsPortalInstalled, useConfluxPortal } from "../";
+import {
+  useConfluxJSDefined,
+  useEpochNumberSWR,
+  initContract,
+  useConfluxPortal,
+} from "./";
+import { useEffect } from "react";
 import abi from "./contracts/CustodianImpl.json";
-import { useEpochNumberSWR } from "./swr";
 
-const c = initContract({ abi });
+let c = initContract({ abi });
 const CUSTODIAN_TOKEN_LIST_SWR_ID = "CUSTODIAN_TOKEN_LIST_SWR_ID";
 
-// contractAddr: ctoken address
-function useCustodian(contractAddr, getTokenList = false) {
+/**
+ * interact with the shuttleflow custodian contract, can only be used with
+ ConfluxPortal installed
+ * @param {Address} contractAddr the shuttleflow custodian proxy contract address
+ * @param {boolean=false} getTokenList should this hook query token list
+ * @returns {Object} check the return code below
+ */
+export default function useCustodian(contractAddr, getTokenList = false) {
+  const confluxJSDefined = useConfluxJSDefined();
+
+  useEffect(() => {
+    if (confluxJSDefined && !c) {
+      c = initContract({ abi });
+    }
+  }, [confluxJSDefined]);
+
   const { address: userAddr } = useConfluxPortal();
 
-  const { data: tokenList, error: tokenListErr } = useEpochNumberSWR(
+  const {
+    data: tokenList,
+    error: tokenListErr,
+  } = useEpochNumberSWR(
     getTokenList ? [CUSTODIAN_TOKEN_LIST_SWR_ID, contractAddr] : null,
-    c.tokenList()
+    c?.tokenList(),
+    { initialData: [] }
   );
 
   if (tokenListErr)
@@ -21,26 +44,27 @@ function useCustodian(contractAddr, getTokenList = false) {
   return {
     tokenList,
     cTokenAddrToRefTokenAddr: (cAddr) =>
-      c.token_reference(cAddr).call({ to: contractAddr }),
+      c?.token_reference(cAddr)?.call({ to: contractAddr }),
     cTokenAddrToRefTokenDeicmals: (cAddr) =>
-      c.token_decimals(cAddr).call({ to: contractAddr }),
+      c?.token_decimals(cAddr)?.call({ to: contractAddr }),
     isRefTokenAdminToken: (refAddr) =>
-      c.admin_token(refAddr).call({ to: contractAddr }),
+      c?.admin_token(refAddr)?.call({ to: contractAddr }),
     refTokenBurnFee: (refAddr) =>
-      c.burn_fee(refAddr).call({ to: contractAddr }),
+      c?.burn_fee(refAddr)?.call({ to: contractAddr }),
     refTokenMintFee: (refAddr) =>
-      c.mint_fee(refAddr).call({ to: contractAddr }),
+      c?.mint_fee(refAddr)?.call({ to: contractAddr }),
     refTokenWalletFee: (refAddr) =>
-      c.wallet_fee(refAddr).call({ to: contractAddr }),
+      c?.wallet_fee(refAddr)?.call({ to: contractAddr }),
     refTokenMinMintValue: (refAddr) =>
-      c.minimal_mint_value(refAddr).call({ to: contractAddr }),
+      c?.minimal_mint_value(refAddr)?.call({ to: contractAddr }),
     btcMinMintValue: () =>
-      c.btc_minimal_mint_value().call({ to: contractAddr }),
+      c?.btc_minimal_mint_value()?.call({ to: contractAddr }),
     refTokenMinBurnValue: (refAddr) =>
-      c.minimal_burn_value(refAddr).call({ to: contractAddr }),
+      c?.minimal_burn_value(refAddr)?.call({ to: contractAddr }),
     btcMinBurnValue: () =>
-      c.btc_minimal_burn_value().call({ to: contractAddr }),
-    minSponsorCETH: () => c.minimal_sponsor_amount().call({ to: contractAddr }),
+      c?.btc_minimal_burn_value()?.call({ to: contractAddr }),
+    minSponsorCETH: () =>
+      c.minimal_sponsor_amount()?.call({ to: contractAddr }),
     /*
       function sponsorToken(
       string memory ref, // lowercase erc20 ethereum address
@@ -61,17 +85,19 @@ function useCustodian(contractAddr, getTokenList = false) {
       minimalMintValue,
       minimalBurnValue
     ) =>
-      c
-        .sponsorToken(
-          refAddr,
-          amount,
-          burnFee,
-          mintFee,
-          walletFee,
-          minimalMintValue,
-          minimalBurnValue
-        )
-        .sendTransaction({ from: userAddr, to: contractAddr }),
+      userAddr
+        ? c
+            ?.sponsorToken(
+              refAddr,
+              amount,
+              burnFee,
+              mintFee,
+              walletFee,
+              minimalMintValue,
+              minimalBurnValue
+            )
+            ?.sendTransaction({ from: userAddr, to: contractAddr })
+        : Promise.reject("portal not installed"),
     /*
       function setTokenParams(
       string memory ref, // lowercase erc20 ethereum address
@@ -90,32 +116,17 @@ function useCustodian(contractAddr, getTokenList = false) {
       minimalMintValue,
       minimalBurnValue
     ) =>
-      c
-        .setTokenParams(
-          refAddr,
-          burnFee,
-          mintFee,
-          walletFee,
-          minimalMintValue,
-          minimalBurnValue
-        )
-        .sendTransaction({ from: userAddr, to: contractAddr }),
+      userAddr
+        ? c
+            ?.setTokenParams(
+              refAddr,
+              burnFee,
+              mintFee,
+              walletFee,
+              minimalMintValue,
+              minimalBurnValue
+            )
+            ?.sendTransaction({ from: userAddr, to: contractAddr })
+        : Promise.reject("portal not installed"),
   };
 }
-
-export default wrapIsPortalInstalled(useCustodian, {
-  tokenList: [],
-  cTokenAddrToRefTokenAddr: () => {},
-  cTokenAddrToRefTokenDeicmals: () => {},
-  isRefTokenAdminToken: () => {},
-  refTokenBurnFee: () => {},
-  refTokenMintFee: () => {},
-  refTokenWalletFee: () => {},
-  refTokenMinMintValue: () => {},
-  btcMinMintValue: () => {},
-  refTokenMinBurnValue: () => {},
-  btcMinBurnValue: () => {},
-  minSponsorCETH: () => {},
-  sponsorAToken: () => {},
-  setTokenParams: () => {},
-});

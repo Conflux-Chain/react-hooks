@@ -1,16 +1,30 @@
-import { initContract, wrapIsPortalInstalled, useEpochNumberSWR } from "../";
+import { useConfluxJSDefined, initContract, useEpochNumberSWR } from "./";
+import { useEffect } from "react";
 import abi from "./contracts/TokenSponsor.json";
 
-const c = initContract({ abi });
 export const GET_SPONSOR_OF_CTOKEN_SWR_ID = "GET_SPONSOR_OF_CTOKEN_SWR_ID";
 export const GET_MOTAGED_CETH_OF_CTOKEN_SWR_ID =
   "GET_MOTAGED_CETH_OF_CTOKEN_SWR_ID";
 export const GET_SPONSOR_REPLACE_RATIO_SWR_ID =
   "GET_SPONSOR_REPLACE_RATIO_SWR_ID";
 
-// contractAddr: address of the TokenSponsor contract
-// tokenAddr: refernce token address
-function useSponsor(contractAddr, tokenAddr) {
+let c = initContract({ abi });
+
+/**
+ * interact with the shuttleflow TokenSponsor contract
+ * @param {Address} contractAddr TokenSponsor contract address
+ * @param {Address} tokenAddr ref token address
+ * @returns {Object} check the return code below
+ */
+export default function useSponsor(contractAddr, tokenAddr) {
+  const confluxJSDefined = useConfluxJSDefined();
+
+  useEffect(() => {
+    if (confluxJSDefined && !c) {
+      c = initContract({ abi });
+    }
+  }, [confluxJSDefined]);
+
   const {
     data: sponsorAddr,
     error: sponsorAddrError,
@@ -18,7 +32,7 @@ function useSponsor(contractAddr, tokenAddr) {
     tokenAddr && contractAddr
       ? [GET_SPONSOR_OF_CTOKEN_SWR_ID, contractAddr, tokenAddr]
       : null,
-    () => c.sponsorOf(tokenAddr).call({ to: contractAddr })
+    () => c?.sponsorOf(tokenAddr)?.call({ to: contractAddr })
   );
 
   if (sponsorAddrError)
@@ -31,7 +45,7 @@ function useSponsor(contractAddr, tokenAddr) {
     tokenAddr && contractAddr
       ? [GET_MOTAGED_CETH_OF_CTOKEN_SWR_ID, tokenAddr, contractAddr]
       : null,
-    () => c.sponsorValueOf(tokenAddr).call({ to: contractAddr })
+    () => c?.sponsorValueOf(tokenAddr)?.call({ to: contractAddr })
   );
 
   if (mortagedCETHError)
@@ -42,7 +56,7 @@ function useSponsor(contractAddr, tokenAddr) {
     error: sponsorReplaceRatioError,
   } = useEpochNumberSWR(
     contractAddr ? [GET_SPONSOR_REPLACE_RATIO_SWR_ID, contractAddr] : null,
-    () => c.sponsorReplaceRatio().call({ to: contractAddr })
+    () => c?.sponsorReplaceRatio()?.call({ to: contractAddr })
   );
 
   if (sponsorReplaceRatioError)
@@ -52,9 +66,3 @@ function useSponsor(contractAddr, tokenAddr) {
 
   return { sponsorAddr, mortagedCETH, sponsorReplaceRatio };
 }
-
-export default wrapIsPortalInstalled(useSponsor, {
-  sponsorAddr: "",
-  mortagedCETH: 0,
-  sponsorReplaceRatio: 0,
-});

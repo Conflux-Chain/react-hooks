@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { useCToken } from "../shuttleflow";
+import { useCToken } from "../src/shuttleflow";
+import ConfluxJSDefinedUI from "./ConfluxJSDefinedUI";
 
 export default {
   title: "Shuttleflow",
@@ -68,6 +69,7 @@ const UseCTokenTemplate = () => {
       <p>Ref token decimal: {refTokenDecimal}</p>
 
       <UseCTokenTemplateSimulation />
+      <ConfluxJSDefinedUI />
     </>
   );
 };

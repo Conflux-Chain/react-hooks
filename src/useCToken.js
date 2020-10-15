@@ -1,7 +1,13 @@
-import { initContract, wrapIsPortalInstalled, useConfluxPortal } from "../";
+import {
+  useConfluxJSDefined,
+  useSWR,
+  useEpochNumberSWR,
+  initContract,
+  useConfluxPortal,
+} from "./";
 import abi from "./contracts/TokenBase.json";
 import cuabi from "./contracts/CustodianImpl.json";
-import useSWR, { useEpochNumberSWR } from "./swr";
+import { useEffect } from "react";
 
 export const CTOKEN_TOTAL_SUPPLY_SWR_ID = "CTOKEN_TOTAL_SUPPLY_SWR_ID";
 export const CTOKEN_BALANCE_SWR_ID = "CTOKEN_BALANCE_SWR_ID";
@@ -9,24 +15,42 @@ export const CTOKEN_TO_REF_TOKEN_ADDR_SWR_ID =
   "CTOKEN_TO_REF_TOKEN_ADDR_SWR_ID";
 export const CTOKEN_TO_REF_TOKEN_DECIMALS_SWR_ID =
   "CTOKEN_TO_REF_TOKEN_DECIMALS_SWR_ID";
-const c = initContract({ abi });
-const cu = initContract({ abi: cuabi });
+
+let c = initContract({ abi });
+let cu = initContract({ abi: cuabi });
 
 // contractAddr: ctoken address
-function useCToken(contractAddr, custodianContractAddr) {
+/**
+ * interact with the shuttleflow TokenBase contract, get cToken info
+ * @param {Address} contractAddr TokenBase contract address
+ * @param {Address} custodianContractAddr custodian contract address
+ * @returns {Object} check the code below
+ */
+export default function useCToken(contractAddr, custodianContractAddr) {
+  const confluxJSDefined = useConfluxJSDefined();
+
+  useEffect(() => {
+    if (confluxJSDefined && !c) {
+      c = initContract({ abi });
+      cu = initContract({ abi: cuabi });
+    }
+  }, [confluxJSDefined]);
+
   const { address: userAddr } = useConfluxPortal();
 
   const { data: totalSupply, totalSupplyErr } = useEpochNumberSWR(
     contractAddr ? [CTOKEN_TOTAL_SUPPLY_SWR_ID, contractAddr] : null,
-    () => c.totalSupply().call({ to: contractAddr })
+    () => c?.totalSupply()?.call({ to: contractAddr })
   );
 
   if (totalSupplyErr)
     console.error(`Error get totalSupply: ${totalSupplyErr.message}`);
 
   const { data: balance, balanceErr } = useEpochNumberSWR(
-    contractAddr ? [CTOKEN_BALANCE_SWR_ID, contractAddr, userAddr] : null,
-    () => c.balanceOf(userAddr).call({ to: contractAddr })
+    userAddr && contractAddr
+      ? [CTOKEN_BALANCE_SWR_ID, contractAddr, userAddr]
+      : null,
+    () => c?.balanceOf(userAddr)?.call({ to: contractAddr })
   );
 
   if (balanceErr) console.error(`Error get balance: ${balanceErr.message}`);
@@ -35,10 +59,10 @@ function useCToken(contractAddr, custodianContractAddr) {
     data: refTokenAddr,
     error: refTokenAddrError,
   } = useSWR(
-    custodianContractAddr && contractAddr
+    confluxJSDefined && custodianContractAddr && contractAddr
       ? [CTOKEN_TO_REF_TOKEN_ADDR_SWR_ID, custodianContractAddr, contractAddr]
       : null,
-    () => cu.token_reference(contractAddr).call({ to: custodianContractAddr })
+    () => cu?.token_reference(contractAddr)?.call({ to: custodianContractAddr })
   );
   if (refTokenAddrError)
     console.error(`[refTokenAddrError]: ${refTokenAddrError.message}`);
@@ -47,14 +71,14 @@ function useCToken(contractAddr, custodianContractAddr) {
     data: refTokenDecimal,
     error: refTokenDecimalError,
   } = useSWR(
-    custodianContractAddr && contractAddr
+    confluxJSDefined && custodianContractAddr && contractAddr
       ? [
           CTOKEN_TO_REF_TOKEN_DECIMALS_SWR_ID,
           custodianContractAddr,
           contractAddr,
         ]
       : null,
-    () => cu.token_decimals(contractAddr).call({ to: custodianContractAddr })
+    () => cu?.token_decimals(contractAddr)?.call({ to: custodianContractAddr })
   );
 
   if (refTokenDecimalError)
@@ -66,9 +90,11 @@ function useCToken(contractAddr, custodianContractAddr) {
     externalAddr,
     defiRelayer = "0x0000000000000000000000000000000000000000"
   ) => {
-    return c
-      .burn(userAddr, amount, expectedFee, externalAddr, defiRelayer)
-      .sendTransaction({ from: userAddr, to: contractAddr });
+    return userAddr
+      ? c
+          ?.burn(userAddr, amount, expectedFee, externalAddr, defiRelayer)
+          ?.sendTransaction({ from: userAddr, to: contractAddr })
+      : Promise.reject("portal not installed");
   };
 
   return {
@@ -79,11 +105,3 @@ function useCToken(contractAddr, custodianContractAddr) {
     refTokenDecimal,
   };
 }
-
-export default wrapIsPortalInstalled(useCToken, {
-  totalSupply: 0,
-  balance: 0,
-  refTokenAddr: "",
-  refTokenDecimal: 0,
-  burn: () => {},
-});
