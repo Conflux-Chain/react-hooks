@@ -1,6 +1,6 @@
 {
   "name": "@cfxjs/react-hooks",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "react hooks to interact with conflux network",
   "main": "index.js",
   "author": "yqrashawn <namy.19@gmail.com>",
