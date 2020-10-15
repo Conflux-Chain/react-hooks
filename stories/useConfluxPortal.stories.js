@@ -1,6 +1,6 @@
 import React from "react";
-import useConfluxPortal from "../src/useConfluxPortal";
-import { useEpochNumber } from "../src/useEpochNumber";
+import { useEpochNumber, useConfluxPortal } from "../src";
+import ConfluxJSDefinedUI from "./ConfluxJSDefinedUI";
 
 export default {
   title: "General",
@@ -41,6 +41,7 @@ const UseConfluxPortalTemplate = () => {
             : "login into portal"
           : "Portal not installed"}
       </button>
+      <ConfluxJSDefinedUI />
     </>
   );
 };
@@ -53,6 +54,7 @@ const UseEpochNumberTemplate = () => {
   return (
     <>
       <p>epochNumber: {epochNumber}</p>
+      <ConfluxJSDefinedUI />
     </>
   );
 };

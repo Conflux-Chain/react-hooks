@@ -1,5 +1,6 @@
 import useSWR from "swr";
 import { useIdle, useEvent } from "react-use";
+import { useConfluxJSDefined } from "./";
 
 export default function useIdleSWR(...args) {
   const [key, ...rest] = args;
@@ -10,7 +11,9 @@ export default function useIdleSWR(...args) {
 }
 
 export function useEpochNumberSWR(...args) {
-  const swrRst = useIdleSWR(...args);
+  const confluxJSDefined = useConfluxJSDefined();
+  const [key, ...rest] = args;
+  const swrRst = useIdleSWR(confluxJSDefined ? key : null, ...rest);
   useEvent("epochNumberUpdated", () => swrRst.mutate());
   return swrRst;
 }

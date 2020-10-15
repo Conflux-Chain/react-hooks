@@ -1,7 +1,7 @@
 import { useState } from "react";
 import SINGLE_CALL_BALANCES_ABI from "./contracts/cfx-single-call-balance-checker-abi.json";
 import { useEffectOnce } from "react-use";
-import { useSWR, useEpochNumberSWR } from "../";
+import { useConfluxJSDefined, useSWR, useEpochNumberSWR } from "./";
 import initContract from "./initContract";
 
 export const UPDATE_CHAINID_SWR_ID = "UPDATE_CHAINID_SWR_ID";
@@ -22,38 +22,36 @@ const singleCallBalanceContract = initContract({
 
 function getTokensBalance(address, tokenAddr) {
   return singleCallBalanceContract
-    .balances(
+    ?.balances(
       [address],
       ["0x0000000000000000000000000000000000000000", ...tokenAddr]
     )
-    .call();
+    ?.call();
 }
 
-export function wrapIsPortalInstalled(installed, notInstalled) {
-  if (window.conflux && window.conflux.isConfluxPortal) {
-    return installed;
-  } else {
-    return () => notInstalled;
-  }
-}
+const isPortalInstalled = () => window?.conflux?.isConfluxPortal;
 
-function useConfluxPortal(tokenAddr = []) {
-  window.conflux.autoRefreshOnNetworkChange = false;
+export default function useConfluxPortal(tokenAddr = []) {
+  useConfluxJSDefined();
 
-  const [address, setAddress] = useState(window.conflux.selectedAddress);
-  const [chainId, setChainId] = useState(window.conflux.chainId);
+  // prevent portal auto refresh when user changes the network
+  if (window && window.conflux && window.conflux.autoRefreshOnNetworkChange)
+    window.conflux.autoRefreshOnNetworkChange = false;
+
+  const [address, setAddress] = useState(window?.conflux?.selectedAddress);
+  const [chainId, setChainId] = useState(window?.conflux?.chainId);
 
   const { data: swrChainId } = useSWR(UPDATE_CHAINID_SWR_ID, async () =>
-    window.conflux.chainId === "loading" ? null : window.conflux.chainId
+    window?.conflux?.chainId === "loading" ? null : window?.conflux?.chainId
   );
 
   if (swrChainId !== chainId) setChainId(swrChainId);
 
   const login = () => {
     if (!address) {
-      window.conflux
-        .enable()
-        .then(
+      window?.conflux
+        ?.enable()
+        ?.then(
           (addresses) => validAddresses(addresses) && setAddress(addresses[0])
         );
     }
@@ -89,37 +87,24 @@ function useConfluxPortal(tokenAddr = []) {
     const networkListener = (chainId) => {
       setChainId(chainId);
     };
-    window.conflux.on("accountsChanged", accountListener);
-    window.conflux.on("networkChanged", networkListener);
+    window?.conflux?.on("accountsChanged", accountListener);
+    window?.conflux?.on("networkChanged", networkListener);
     return () => {
-      if (window.conflux) {
-        window.conflux.off("accountsChanged", accountListener);
-        window.conflux.off("networkChanged", networkListener);
-      }
+      window?.conflux?.off("accountsChanged", accountListener);
+      window?.conflux?.off("networkChanged", networkListener);
     };
   });
 
   return {
-    portalInstalled: true,
+    portalInstalled: Boolean(isPortalInstalled()),
     address,
     balances: [balance, tokenBalances],
     chainId,
     login,
     useEnsurePortalLogin,
-    conflux: window.conflux,
-    confluxJS: window.confluxJS,
+    conflux: window?.conflux,
+    confluxJS: window?.confluxJS,
   };
 }
 
 useConfluxPortal.openHomePage = openHomePage;
-
-export default wrapIsPortalInstalled(useConfluxPortal, {
-  portalInstalled: false,
-  address: "",
-  balances: [0, []],
-  chainId: "loading",
-  login: () => {},
-  useEnsurePortalLogin: () => {},
-  conflux: {},
-  confluxJS: {},
-});
