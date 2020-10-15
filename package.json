@@ -23,8 +23,9 @@
     "react-is": "^16.13.1",
     "semantic-release": "^17.2.0"
   },
+  "files": ["src", "lib"],
   "scripts": {
-    "prerelease": "yarn run build",
+    "prepublish": "yarn run build",
     "start": "start-storybook -p 6006",
     "build": "babel src -d lib",
     "build-doc": "build-storybook"
