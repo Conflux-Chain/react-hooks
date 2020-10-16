@@ -1,6 +1,6 @@
 {
   "name": "@cfxjs/react-hooks",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "react hooks to interact with conflux network",
   "main": "lib/index.js",
   "author": "yqrashawn <namy.19@gmail.com>",
@@ -30,7 +30,7 @@
   "scripts": {
     "prepublish": "yarn run build",
     "start": "start-storybook -p 6006",
-    "build": "babel src -d lib --source-maps",
+    "build": "babel src -d lib --source-maps --copy-files",
     "build-doc": "build-storybook"
   },
   "peerDependencies": {
