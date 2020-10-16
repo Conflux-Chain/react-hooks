@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { useCToken } from "../src/shuttleflow";
 import ConfluxJSDefinedUI from "./ConfluxJSDefinedUI";
 
@@ -15,19 +15,20 @@ const UseCTokenTemplateSimulation = () => {
     balance,
     refTokenAddr,
     refTokenDecimal,
+    refTokenBurnFee,
     burn,
   } = useCToken(cethAddr, custodianProxyAddr);
 
   const [burnning, setBurnning] = useState(false);
   const [burnRst, setBurnRst] = useState("");
+  const amountRef = useRef(null);
+  const externalAddressRef = useRef(null);
   const shuttleout = async () => {
     try {
       setBurnning(true);
       const rst = await burn(
-        0,
-        0,
-        "0x83dfad4705a2bcf8b961bf0fdeac2f22738dc74f", // fake ceth address
-        "0x0000000000000000000000000000000000000000"
+        0, // amount
+        externalAddressRef?.current?.value //  external address
       );
       setBurnning(false);
       setBurnRst(rst);
@@ -37,13 +38,17 @@ const UseCTokenTemplateSimulation = () => {
       throw err;
     }
   };
+
   return (
     <>
       <h1> 模拟盘 </h1>
-      <p>CETH total supply: {(totalSupply / 1e18).toString()} CETH</p>
-      <p>Current User CETH balance: {(balance / 1e18).toString()} CETH</p>
+      <p>cETH total supply: {(totalSupply / 1e18).toString()} cETH</p>
+      <p>Current User cETH balance: {(balance / 1e18).toString()} cETH</p>
       <p>Ref token address: {refTokenAddr}</p>
       <p>Ref token decimal: {refTokenDecimal}</p>
+      <p>Ref token burn fee: {refTokenBurnFee?.toString()} cETH</p>
+      <input ref={amountRef} type="number" placeholder="Shuttle Out Amount" />
+      <input ref={externalAddressRef} placeholder="External Address" />
       <button disabled={burnning} onClick={shuttleout}>
         Burn (shuttle out)
       </button>
@@ -56,17 +61,21 @@ const UseCTokenTemplateSimulation = () => {
 const UseCTokenTemplate = () => {
   const cethAddr = "0x85b1432b900ec2552a3f119d4e99f4b0f8078e29";
   const custodianProxyAddr = "0x8d315799a20bcf3afcd18e3a44e98973b49ea9da";
-  const { totalSupply, balance, refTokenAddr, refTokenDecimal } = useCToken(
-    cethAddr,
-    custodianProxyAddr
-  );
+  const {
+    totalSupply,
+    balance,
+    refTokenAddr,
+    refTokenDecimal,
+    refTokenBurnFee,
+  } = useCToken(cethAddr, custodianProxyAddr);
   return (
     <>
       <h1> 正式盘 </h1>
-      <p>CETH total supply: {(totalSupply / 1e18).toString()} CETH</p>
-      <p>Current User CETH balance: {(balance / 1e18).toString()} CETH</p>
+      <p>cETH total supply: {(totalSupply / 1e18).toString()} cETH</p>
+      <p>Current User cETH balance: {(balance / 1e18).toString()} cETH</p>
       <p>Ref token address: {refTokenAddr}</p>
       <p>Ref token decimal: {refTokenDecimal}</p>
+      <p>Ref token burn fee: {refTokenBurnFee?.toString()} cETH</p>
 
       <UseCTokenTemplateSimulation />
       <ConfluxJSDefinedUI />

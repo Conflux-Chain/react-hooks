@@ -1,3 +1,5 @@
+import { useEffect } from "react";
+import Big from "big.js";
 import {
   useConfluxJSDefined,
   useSWR,
@@ -7,11 +9,13 @@ import {
 } from "./";
 import abi from "./contracts/TokenBase.json";
 import cuabi from "./contracts/CustodianImpl.json";
-import { useEffect } from "react";
+import { to18Decimal } from "./utils";
 
 export const CTOKEN_TOTAL_SUPPLY_SWR_ID = "CTOKEN_TOTAL_SUPPLY_SWR_ID";
 export const CTOKEN_BALANCE_SWR_ID = "CTOKEN_BALANCE_SWR_ID";
 export const CTOKEN_TO_REF_TOKEN_ADDR_SWR_ID =
+  "CTOKEN_TO_REF_TOKEN_ADDR_SWR_ID";
+export const REF_TOKEN_ADDR_TO_BURN_FEE_SWR_ID =
   "CTOKEN_TO_REF_TOKEN_ADDR_SWR_ID";
 export const CTOKEN_TO_REF_TOKEN_DECIMALS_SWR_ID =
   "CTOKEN_TO_REF_TOKEN_DECIMALS_SWR_ID";
@@ -80,19 +84,40 @@ export default function useCToken(contractAddr, custodianContractAddr) {
       : null,
     () => cu?.token_decimals(contractAddr)?.call({ to: custodianContractAddr })
   );
-
   if (refTokenDecimalError)
     console.error(`[refTokenDecimalError]: ${refTokenDecimalError.message}`);
 
+  const {
+    data: refTokenBurnFee, // of ref token decimal
+    error: refTokenBurnFeeError,
+  } = useEpochNumberSWR(
+    custodianContractAddr && refTokenAddr && refTokenDecimal
+      ? [
+          REF_TOKEN_ADDR_TO_BURN_FEE_SWR_ID,
+          custodianContractAddr,
+          refTokenAddr,
+          refTokenDecimal,
+        ]
+      : null,
+    () =>
+      cu
+        ?.burn_fee(refTokenAddr)
+        .call({ to: custodianContractAddr })
+        .then((burnFee) => to18Decimal(burnFee, refTokenDecimal))
+  );
+
+  if (refTokenBurnFeeError)
+    console.error(`Error get refTokenBurnFee: ${refTokenBurnFeeError.message}`);
+
   const burn = (
     amount,
-    expectedFee,
     externalAddr,
     defiRelayer = "0x0000000000000000000000000000000000000000"
   ) => {
-    return userAddr
+    amount = Big(amount).times(1e18);
+    return userAddr && refTokenBurnFee
       ? c
-          ?.burn(userAddr, amount, expectedFee, externalAddr, defiRelayer)
+          ?.burn(userAddr, amount, refTokenBurnFee, externalAddr, defiRelayer)
           ?.sendTransaction({ from: userAddr, to: contractAddr })
       : Promise.reject("portal not installed");
   };
@@ -103,5 +128,7 @@ export default function useCToken(contractAddr, custodianContractAddr) {
     burn,
     refTokenAddr,
     refTokenDecimal,
+    refTokenBurnFee: refTokenBurnFee?.div(1e18),
+    refTokenBurnFeeRaw: refTokenBurnFee,
   };
 }

@@ -3,6 +3,7 @@
   "version": "0.1.2",
   "description": "react hooks to interact with conflux network",
   "main": "lib/index.js",
+  "module": "lib/index.js",
   "author": "yqrashawn <namy.19@gmail.com>",
   "license": "MIT",
   "devDependencies": {
@@ -38,6 +39,7 @@
     "react-dom": "^16.8.0"
   },
   "dependencies": {
+    "big.js": "^6.0.1",
     "react-use": "^15.3.4",
     "swr": "^0.3.5"
   },
