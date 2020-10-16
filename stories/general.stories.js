@@ -1,9 +1,10 @@
-import React from "react";
+import React, { useMemo, useState } from "react";
 import {
   useStatus,
   useEpochNumber,
   useConfluxPortal,
   useBalance,
+  useConfirmationRiskByHash,
 } from "../src";
 import ConfluxJSDefinedUI from "./ConfluxJSDefinedUI";
 
@@ -98,3 +99,26 @@ const UseStatusTemplate = () => {
 };
 
 export const UseStatus = UseStatusTemplate.bind({});
+
+const UseConfirmationRiskTemplate = () => {
+  const [resetCount, setResetCount] = useState(1);
+  const status = useStatus();
+  const currentBlockHash = useMemo(() => status?.bestHash, [
+    Boolean(status?.bestHash),
+    resetCount,
+  ]);
+  const risk = useConfirmationRiskByHash(currentBlockHash);
+
+  return (
+    <>
+      <p>block: {currentBlockHash}</p>
+      <p>risk: {risk}</p>
+      <button onClick={() => setResetCount((c) => c + 1)}>
+        try another block
+      </button>
+      <ConfluxJSDefinedUI />
+    </>
+  );
+};
+
+export const UseConfirmationRisk = UseConfirmationRiskTemplate.bind({});
