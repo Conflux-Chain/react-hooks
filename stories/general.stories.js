@@ -1,5 +1,5 @@
 import React from "react";
-import { useEpochNumber, useConfluxPortal } from "../src";
+import { useEpochNumber, useConfluxPortal, useBalance } from "../src";
 import ConfluxJSDefinedUI from "./ConfluxJSDefinedUI";
 
 export default {
@@ -60,3 +60,23 @@ const UseEpochNumberTemplate = () => {
 };
 
 export const UseEpochNumber = UseEpochNumberTemplate.bind({});
+
+const UseBalanceTemplate = () => {
+  const userAddr = "0x1202894ac930192145a0904daed5e21333115744";
+  const tokenAddrs = [
+    "0x87010faf5964d67ed070bc4b8dcafa1e1adc0997", // fc contract address
+    "0x85b1432b900ec2552a3f119d4e99f4b0f8078e29", // ceth contract address
+  ];
+  const [balance, [fcBalance, cethBalance]] = useBalance(userAddr, tokenAddrs);
+
+  return (
+    <>
+      <p>CFX Balance: {(balance / 1e18).toString()} CFX</p>
+      <p>FC Balance: {(fcBalance / 1e18).toString()} FC</p>
+      <p>cETH Balance: {(cethBalance / 1e18).toString()} cETH</p>
+      <ConfluxJSDefinedUI />
+    </>
+  );
+};
+
+export const UseBalance = UseBalanceTemplate.bind({});

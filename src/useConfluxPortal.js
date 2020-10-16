@@ -1,11 +1,9 @@
 import { useState } from "react";
-import SINGLE_CALL_BALANCES_ABI from "./contracts/cfx-single-call-balance-checker-abi.json";
 import { useEffectOnce } from "react-use";
-import { useConfluxJSDefined, useSWR, useEpochNumberSWR } from "./";
-import initContract from "./initContract";
+import { useConfluxJSDefined, useSWR } from "./";
+import { useBalance } from "./";
 
 export const UPDATE_CHAINID_SWR_ID = "UPDATE_CHAINID_SWR_ID";
-export const UPDATE_USER_BALANCE_SWR_ID = "UPDATE_USER_BALANCE_SWR_ID";
 
 function openHomePage() {
   window.open("https://portal.conflux-chain.org");
@@ -15,23 +13,9 @@ function validAddresses(addresses) {
   return Array.isArray(addresses) && addresses.length;
 }
 
-const singleCallBalanceContract = initContract({
-  abi: SINGLE_CALL_BALANCES_ABI,
-  address: "0x8f35930629fce5b5cf4cd762e71006045bfeb24d",
-});
-
-function getTokensBalance(address, tokenAddr) {
-  return singleCallBalanceContract
-    ?.balances(
-      [address],
-      ["0x0000000000000000000000000000000000000000", ...tokenAddr]
-    )
-    ?.call();
-}
-
 const isPortalInstalled = () => window?.conflux?.isConfluxPortal;
 
-export default function useConfluxPortal(tokenAddr = []) {
+export default function useConfluxPortal(tokenAddrs = []) {
   useConfluxJSDefined();
 
   // prevent portal auto refresh when user changes the network
@@ -62,18 +46,7 @@ export default function useConfluxPortal(tokenAddr = []) {
     useEffectOnce(login);
   };
 
-  const {
-    data: [balance, ...tokenBalances],
-    error: balanceErr,
-  } = useEpochNumberSWR(
-    address && singleCallBalanceContract
-      ? [UPDATE_USER_BALANCE_SWR_ID, address, tokenAddr.toString()]
-      : null,
-    () => getTokensBalance(address, tokenAddr),
-    { initialData: [0, ...tokenAddr.map(() => 0)] }
-  );
-
-  if (balanceErr) console.error(`Get Balance Error: ${balanceErr.message}`);
+  const [balance, tokenBalances] = useBalance(address, tokenAddrs);
 
   // eslint-disable-next-line react-hooks/rules-of-hooks
   useEffectOnce(() => {
