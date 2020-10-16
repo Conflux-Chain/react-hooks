@@ -1,5 +1,10 @@
 import React from "react";
-import { useEpochNumber, useConfluxPortal, useBalance } from "../src";
+import {
+  useStatus,
+  useEpochNumber,
+  useConfluxPortal,
+  useBalance,
+} from "../src";
 import ConfluxJSDefinedUI from "./ConfluxJSDefinedUI";
 
 export default {
@@ -80,3 +85,16 @@ const UseBalanceTemplate = () => {
 };
 
 export const UseBalance = UseBalanceTemplate.bind({});
+
+const UseStatusTemplate = () => {
+  const status = useStatus();
+
+  return (
+    <>
+      <p>Status: {JSON.stringify(status)} CFX</p>
+      <ConfluxJSDefinedUI />
+    </>
+  );
+};
+
+export const UseStatus = UseStatusTemplate.bind({});
