@@ -5,6 +5,7 @@ import {
   useConfluxPortal,
   useBalance,
   useConfirmationRiskByHash,
+  useClientVersion,
 } from "../src";
 import ConfluxJSDefinedUI from "./ConfluxJSDefinedUI";
 
@@ -122,3 +123,18 @@ const UseConfirmationRiskTemplate = () => {
 };
 
 export const UseConfirmationRisk = UseConfirmationRiskTemplate.bind({});
+
+const UseClientVersionTemplate = () => {
+  console.log(useClientVersion());
+  const clientVersion = useClientVersion();
+
+  return (
+    <>
+      <p>Fullnode version: {clientVersion}</p>
+      <br />
+      <ConfluxJSDefinedUI />
+    </>
+  );
+};
+
+export const UseClientVersion = UseClientVersionTemplate.bind({});
