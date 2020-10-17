@@ -10,6 +10,7 @@ const EPOCH_NUMBER_UPDATED_EVENT = new CustomEvent(
 
 function dispatchEpochNumberUpdated() {
   window?.confluxJS?.getEpochNumber()?.then((epochNumber) => {
+    if (EPOCH_NUMBER_UPDATED_EVENT_DATA.detail === epochNumber) return;
     EPOCH_NUMBER_UPDATED_EVENT_DATA.detail = epochNumber;
     window.dispatchEvent(EPOCH_NUMBER_UPDATED_EVENT);
   });
