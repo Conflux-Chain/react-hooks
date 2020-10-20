@@ -16,4 +16,6 @@ export { default as useClientVersion } from "./useClientVersion";
 import * as shuttleFlow from "./shuttleflow";
 export { shuttleFlow };
 
+export { default as Big } from "big.js";
+
 setupEpochListener();
