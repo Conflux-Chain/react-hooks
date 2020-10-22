@@ -11,6 +11,7 @@
     "@babel/core": "^7.12.0",
     "@babel/plugin-proposal-export-namespace-from": "^7.12.0",
     "@babel/plugin-proposal-optional-chaining": "^7.12.0",
+    "@babel/preset-env": "^7.12.1",
     "@storybook/addon-actions": "^6.0.26",
     "@storybook/addon-console": "^1.2.2",
     "@storybook/addon-essentials": "^6.0.26",
