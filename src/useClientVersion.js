@@ -1,9 +1,3 @@
-/* -*- mode: js2 -*- */
-/**
- * @fileOverview
- * @name useClientVersion.js
- * @author yqrashawn <namy.19@gmail.com>
- */
 import { useSWR, useConfluxJSDefined } from "./";
 import { useEffect } from "react";
 
@@ -25,7 +19,7 @@ export default function useClientVersion() {
   }, [confluxJSDefined]);
 
   if (getClientVersionError)
-    console.error("Error get clientVersion: ${getClientVersionError?.message}");
+    console.error(`Error get clientVersion: ${getClientVersionError?.message}`);
 
   return clientVersion;
 }
