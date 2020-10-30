@@ -38,7 +38,7 @@ export default function useBalance(userAddr, tokenAddrs) {
       ? [UPDATE_USER_BALANCE_SWR_ID, userAddr, tokenAddrs.toString()]
       : null,
     () => getTokensBalance(userAddr, tokenAddrs),
-    { initialData: [0, ...tokenAddrs.map(() => 0)] }
+    { initialData: [0, ...tokenAddrs.map(() => 0)], revalidateOnMount: true }
   );
 
   if (balanceErr) console.error(`Get Balance Error: ${balanceErr.message}`);

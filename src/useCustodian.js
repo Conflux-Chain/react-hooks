@@ -34,7 +34,7 @@ export default function useCustodian(contractAddr, getTokenList = false) {
   } = useEpochNumberSWR(
     getTokenList ? [CUSTODIAN_TOKEN_LIST_SWR_ID, contractAddr] : null,
     c?.tokenList(),
-    { initialData: [] }
+    { initialData: [], revalidateOnMount: true }
   );
 
   if (tokenListErr)

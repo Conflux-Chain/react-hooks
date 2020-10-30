@@ -4,7 +4,9 @@ import { useEffectOnce } from "react-use";
 let CONFLUXJS_INTERVAL_DEFINED = false;
 
 export default function useConfluxJSDefined(customInterval = 100) {
-  const [defined, setDefined] = useState(CONFLUXJS_INTERVAL_DEFINED);
+  const [defined, setDefined] = useState(
+    CONFLUXJS_INTERVAL_DEFINED || Boolean(window?.confluxJS)
+  );
   const intervalRef = useRef(null);
   useEffectOnce(() => {
     if (!defined) {

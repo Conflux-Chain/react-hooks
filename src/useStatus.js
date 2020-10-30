@@ -6,7 +6,7 @@ export default function useStatus() {
   const { data: status, error: getStatusError } = useEpochNumberSWR(
     [GET_STATUS_SWR_ID],
     () => window?.confluxJS?.getStatus(),
-    { initialData: {} }
+    { initialData: {}, revalidateOnMount: true }
   );
 
   if (getStatusError)
