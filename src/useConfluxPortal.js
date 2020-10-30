@@ -22,7 +22,9 @@ export default function useConfluxPortal(tokenAddrs = []) {
   if (window && window.conflux && window.conflux.autoRefreshOnNetworkChange)
     window.conflux.autoRefreshOnNetworkChange = false;
 
-  const [address, setAddress] = useState(window?.conflux?.selectedAddress);
+  const [address, setAddress] = useState(
+    window?.conflux?.selectedAddress || undefined
+  );
   const [chainId, setChainId] = useState(window?.conflux?.chainId);
 
   const { data: swrChainId } = useSWR(UPDATE_CHAINID_SWR_ID, async () =>
