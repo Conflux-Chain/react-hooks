@@ -23,7 +23,7 @@ export default function useConfluxPortal(tokenAddrs = []) {
     window.conflux.autoRefreshOnNetworkChange = false;
 
   const [address, setAddress] = useState(
-    window?.conflux?.selectedAddress || undefined
+    window.localStorage.getItem("PORTAL_ADDRESS_CACHE") || undefined
   );
   const [chainId, setChainId] = useState(window?.conflux?.chainId);
 
@@ -54,9 +54,11 @@ export default function useConfluxPortal(tokenAddrs = []) {
   useEffectOnce(() => {
     const accountListener = (newAccounts) => {
       if (validAddresses(newAccounts)) {
+        window.localStorage.setItem("PORTAL_ADDRESS_CACHE", newAccounts[0]);
         setAddress(newAccounts[0]);
       } else {
-        setAddress(null);
+        if (address) setAddress(null);
+        window.localStorage.setItem("PORTAL_ADDRESS_CACHE", null);
       }
     };
     const networkListener = (chainId) => {
