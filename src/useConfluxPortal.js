@@ -58,7 +58,7 @@ export default function useConfluxPortal(tokenAddrs = []) {
         setAddress(newAccounts[0]);
       } else {
         if (address) setAddress(null);
-        window.localStorage.setItem("PORTAL_ADDRESS_CACHE", null);
+        window.localStorage.removeItem("PORTAL_ADDRESS_CACHE");
       }
     };
     const networkListener = (chainId) => {
