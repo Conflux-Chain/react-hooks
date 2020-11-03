@@ -114,7 +114,7 @@ export default function useCToken(contractAddr, custodianContractAddr) {
     externalAddr,
     defiRelayer = "0x0000000000000000000000000000000000000000"
   ) => {
-    amount = Big(amount).times(1e18);
+    amount = Big(amount).times(1e18).toFixed();
     return userAddr && refTokenBurnFee
       ? c
           ?.burn(userAddr, amount, refTokenBurnFee, externalAddr, defiRelayer)
