@@ -14,6 +14,9 @@ export default function useConfluxJSDefined(customInterval = 100) {
         if (window?.confluxJS) {
           setDefined(true);
           clearInterval(intervalRef.current);
+        } else if (window.localStorage.getItem("PORTAL_ADDRESS_CACHE")) {
+          // remove cached address if portal can't detect portal
+          window.localStorage.removeItem("PORTAL_ADDRESS_CACHE");
         }
       }, customInterval);
     }
