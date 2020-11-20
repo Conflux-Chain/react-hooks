@@ -36,6 +36,15 @@ export default function useConfluxPortal(tokenAddrs = []) {
       : null
   );
   const [chainId, setChainId] = useState(window?.conflux?.chainId);
+  window.conflux.send({ method: "cfx_accounts" }).then((accounts) => {
+    if (validAddresses(accounts)) {
+      setAddress(accounts([0]));
+      window.localStorage.setItem("CFXJS_REACT_HOOK_PORTAL_ADDRESS_CACHE");
+    } else {
+      window.localStorage.removeItem("CFXJS_REACT_HOOK_PORTAL_ADDRESS_CACHE");
+      setAddress(null);
+    }
+  });
 
   const { data: swrChainId } = useSWR(UPDATE_CHAINID_SWR_ID, async () =>
     window?.conflux?.chainId === "loading" ? null : window?.conflux?.chainId
