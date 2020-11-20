@@ -1,6 +1,6 @@
 {
   "name": "@cfxjs/react-hooks",
-  "version": "0.1.21",
+  "version": "0.2.0",
   "description": "react hooks to interact with conflux network",
   "main": "lib/index.js",
   "module": "lib/index.js",
@@ -25,10 +25,7 @@
     "react-is": "^16.13.1",
     "semantic-release": "^17.2.0"
   },
-  "files": [
-    "src",
-    "lib"
-  ],
+  "files": ["src", "lib"],
   "scripts": {
     "prepublish": "yarn run build",
     "start": "start-storybook -p 6006",

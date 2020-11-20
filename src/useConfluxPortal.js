@@ -38,10 +38,13 @@ export default function useConfluxPortal(tokenAddrs = []) {
   const [chainId, setChainId] = useState(window?.conflux?.chainId);
 
   useEffectOnce(() => {
-    window.conflux.send({ method: "cfx_accounts" }).then((accounts) => {
+    window?.conflux?.send({ method: "cfx_accounts" }).then((accounts) => {
       if (validAddresses(accounts)) {
         setAddress(accounts[0]);
-        window.localStorage.setItem("CFXJS_REACT_HOOK_PORTAL_ADDRESS_CACHE");
+        window.localStorage.setItem(
+          "CFXJS_REACT_HOOK_PORTAL_ADDRESS_CACHE",
+          accounts[0]
+        );
       } else {
         window.localStorage.removeItem("CFXJS_REACT_HOOK_PORTAL_ADDRESS_CACHE");
         setAddress(null);
