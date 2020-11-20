@@ -22,9 +22,18 @@ export default function useConfluxPortal(tokenAddrs = []) {
   if (window && window.conflux && window.conflux.autoRefreshOnNetworkChange)
     window.conflux.autoRefreshOnNetworkChange = false;
 
+  if (
+    !window.conflux &&
+    window.localStorage.getItem("CFXJS_REACT_HOOK_PORTAL_ADDRESS_CACHE")
+  )
+    window.localStorage.removeItem("CFXJS_REACT_HOOK_PORTAL_ADDRESS_CACHE");
+
   const [address, setAddress] = useState(
-    window.localStorage.getItem("CFXJS_REACT_HOOK_PORTAL_ADDRESS_CACHE") ||
-      undefined
+    // NOTE: if portal is installed, there must be window.conflux here
+    window.conflux
+      ? window.localStorage.getItem("CFXJS_REACT_HOOK_PORTAL_ADDRESS_CACHE") ||
+          undefined
+      : null
   );
   const [chainId, setChainId] = useState(window?.conflux?.chainId);
 
