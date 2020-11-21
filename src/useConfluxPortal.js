@@ -85,7 +85,7 @@ export default function useConfluxPortal(tokenAddrs = []) {
         );
         setAddress(newAccounts[0]);
       } else {
-        if (address) setAddress(null);
+        if (address !== null) setAddress(null);
         window.localStorage.removeItem("CFXJS_REACT_HOOK_PORTAL_ADDRESS_CACHE");
       }
     };
