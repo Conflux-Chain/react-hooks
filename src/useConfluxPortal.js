@@ -60,11 +60,17 @@ export default function useConfluxPortal(tokenAddrs = []) {
 
   const login = () => {
     if (!address) {
-      window?.conflux
-        ?.enable()
-        ?.then(
-          (addresses) => validAddresses(addresses) && setAddress(addresses[0])
-        );
+      if (window?.conflux?.enable) {
+        window.conflux
+          .enable()
+          ?.then(
+            (addresses) => validAddresses(addresses) && setAddress(addresses[0])
+          );
+      } else {
+        if (useConfluxPortal.loginFallback) {
+          useConfluxPortal.loginFallback();
+        }
+      }
     }
   };
 
@@ -113,3 +119,4 @@ export default function useConfluxPortal(tokenAddrs = []) {
 }
 
 useConfluxPortal.openHomePage = openHomePage;
+useConfluxPortal.loginFallback = openHomePage;
