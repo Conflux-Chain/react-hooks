@@ -58,13 +58,15 @@ export default function useConfluxPortal(tokenAddrs = []) {
 
   if (swrChainId !== chainId) setChainId(swrChainId);
 
-  const login = () => {
+  const login = (fallbackFn) => {
     if (!address) {
-      window?.conflux
-        ?.enable()
-        ?.then(
-          (addresses) => validAddresses(addresses) && setAddress(addresses[0])
-        );
+      if (window?.conflux?.enable)
+        return window.conflux
+          .enable()
+          .then(
+            (addresses) => validAddresses(addresses) && setAddress(addresses[0])
+          );
+      return typeof fallbackFn === "function" && fallbackFn();
     }
   };
 
