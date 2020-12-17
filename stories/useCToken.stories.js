@@ -1,5 +1,6 @@
 import React, { useState, useRef } from "react";
 import { useCToken } from "../src/shuttleflow";
+import { Big } from "../src";
 import ConfluxJSDefinedUI from "./ConfluxJSDefinedUI";
 
 export default {
@@ -8,8 +9,8 @@ export default {
 };
 
 const UseCTokenTemplateSimulation = () => {
-  const cethAddr = "0x83dfad4705a2bcf8b961bf0fdeac2f22738dc74f";
-  const custodianProxyAddr = "0x82209899b1faa5f32ec80a7c7efb34aee7273d90";
+  const cethAddr = "0x86d2fb177eff4be03a342951269096265b98ac46";
+  const custodianProxyAddr = "0x8248210d7d45791607afb09fe4309c557202faf7";
   const {
     totalSupply,
     balance,
@@ -42,8 +43,8 @@ const UseCTokenTemplateSimulation = () => {
   return (
     <>
       <h1> 模拟盘 </h1>
-      <p>cETH total supply: {(totalSupply / 1e18).toString()} cETH</p>
-      <p>Current User cETH balance: {(balance / 1e18).toString()} cETH</p>
+      <p>cETH total supply: {(Big(totalSupply) / 1e18).toString()} cETH</p>
+      <p>Current User cETH balance: {(Big(balance) / 1e18).toString()} cETH</p>
       <p>Ref token address: {refTokenAddr}</p>
       <p>Ref token decimal: {refTokenDecimal}</p>
       <p>Ref token burn fee: {refTokenBurnFee?.toString()} cETH</p>
@@ -59,8 +60,8 @@ const UseCTokenTemplateSimulation = () => {
 };
 
 const UseCTokenTemplate = () => {
-  const cethAddr = "0x85b1432b900ec2552a3f119d4e99f4b0f8078e29";
-  const custodianProxyAddr = "0x8d315799a20bcf3afcd18e3a44e98973b49ea9da";
+  const cethAddr = "0x86d2fb177eff4be03a342951269096265b98ac46";
+  const custodianProxyAddr = "0x8248210d7d45791607afb09fe4309c557202faf7";
   const {
     totalSupply,
     balance,
@@ -71,8 +72,8 @@ const UseCTokenTemplate = () => {
   return (
     <>
       <h1> 正式盘 </h1>
-      <p>cETH total supply: {(totalSupply / 1e18).toString()} cETH</p>
-      <p>Current User cETH balance: {(balance / 1e18).toString()} cETH</p>
+      <p>cETH total supply: {(Big(totalSupply) / 1e18).toString()} cETH</p>
+      <p>Current User cETH balance: {(Big(balance) / 1e18).toString()} cETH</p>
       <p>Ref token address: {refTokenAddr}</p>
       <p>Ref token decimal: {refTokenDecimal}</p>
       <p>Ref token burn fee: {refTokenBurnFee?.toString()} cETH</p>

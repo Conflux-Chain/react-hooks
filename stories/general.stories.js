@@ -6,6 +6,7 @@ import {
   useBalance,
   useConfirmationRiskByHash,
   useClientVersion,
+  Big,
 } from "../src";
 import ConfluxJSDefinedUI from "./ConfluxJSDefinedUI";
 
@@ -28,14 +29,14 @@ const UseConfluxPortalTemplate = () => {
   useEnsurePortalLogin();
   const loggedIn = Boolean(address);
   const [fcBalance, cethBalance] = tokenBalances.map((b) =>
-    (b / 1e18).toString()
+    (Big(b) / 1e18).toString()
   );
 
   return (
     <>
       <p>portalInstalled: {portalInstalled.toString()}</p>
       <p>address: {address}</p>
-      <p>CFX balance: {(cfxBalance / 1e18).toString()} CFX</p>
+      <p>CFX balance: {(Big(cfxBalance) / 1e18).toString()} CFX</p>
       <div>
         token balances:
         <p> FC: {fcBalance} FC</p>
@@ -78,9 +79,9 @@ const UseBalanceTemplate = () => {
 
   return (
     <>
-      <p>CFX Balance: {(balance / 1e18).toString()} CFX</p>
-      <p>FC Balance: {(fcBalance / 1e18).toString()} FC</p>
-      <p>cETH Balance: {(cethBalance / 1e18).toString()} cETH</p>
+      <p>CFX Balance: {(Big(balance) / 1e18).toString()} CFX</p>
+      <p>FC Balance: {(Big(fcBalance) / 1e18).toString()} FC</p>
+      <p>cETH Balance: {(Big(cethBalance) / 1e18).toString()} cETH</p>
       <ConfluxJSDefinedUI />
     </>
   );

@@ -56,7 +56,7 @@ export default function useSponsor(contractAddr, tokenAddr) {
     error: sponsorReplaceRatioError,
   } = useEpochNumberSWR(
     contractAddr ? [GET_SPONSOR_REPLACE_RATIO_SWR_ID, contractAddr] : null,
-    () => c?.sponsorReplaceRatio()?.call({ to: contractAddr })
+    () => c?.sponsor_replace_ratio()?.call({ to: contractAddr })
   );
 
   if (sponsorReplaceRatioError)
