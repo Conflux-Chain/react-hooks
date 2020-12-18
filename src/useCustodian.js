@@ -76,7 +76,7 @@ export default function useCustodian(contractAddr, getTokenList = false) {
       uint256 _minimal_burn_value // minimal burn value of erc20 token, in erc20 decimals
       ) public;
     */
-    sponsorAToken: (
+    sponsorToken: (
       refAddr,
       amount,
       burnFee,
