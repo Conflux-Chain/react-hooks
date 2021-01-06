@@ -22,8 +22,8 @@ const UseConfluxPortalTemplate = () => {
     login,
     useEnsurePortalLogin,
   } = useConfluxPortal([
-    "0x87010faf5964d67ed070bc4b8dcafa1e1adc0997", // fc contract address
-    "0x85b1432b900ec2552a3f119d4e99f4b0f8078e29", // ceth contract address
+    "0x8e2f2e68eb75bb8b18caafe9607242d4748f8d98", // fc contract address
+    "0x86d2fb177eff4be03a342951269096265b98ac46", // ceth contract address
   ]);
 
   useEnsurePortalLogin();
@@ -72,8 +72,8 @@ export const UseEpochNumber = UseEpochNumberTemplate.bind({});
 const UseBalanceTemplate = () => {
   const userAddr = "0x1202894ac930192145a0904daed5e21333115744";
   const tokenAddrs = [
-    "0x87010faf5964d67ed070bc4b8dcafa1e1adc0997", // fc contract address
-    "0x85b1432b900ec2552a3f119d4e99f4b0f8078e29", // ceth contract address
+    "0x8e2f2e68eb75bb8b18caafe9607242d4748f8d98", // fc contract address
+    "0x86d2fb177eff4be03a342951269096265b98ac46", // ceth contract address
   ];
   const [balance, [fcBalance, cethBalance]] = useBalance(userAddr, tokenAddrs);
 
