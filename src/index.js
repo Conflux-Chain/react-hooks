@@ -1,21 +1,18 @@
-export { default as useConfluxPortal } from "./useConfluxPortal";
+export { default as useConfluxPortal } from "./useConfluxPortal"
 import {
   useEpochNumber,
   useEpochNumberFn,
   setupEpochListener,
-} from "./useEpochNumber";
-export { default as useBalance } from "./useBalance";
-export { useEpochNumber, useEpochNumberFn };
-export { default as useSWR, useEpochNumberSWR } from "./swr";
-export { default as initContract } from "./initContract";
-export { default as useConfluxJSDefined } from "./useConfluxJSDefined";
-export { default as useStatus } from "./useStatus";
-export { default as useConfirmationRiskByHash } from "./useConfirmationRiskByHash";
-export { default as useClientVersion } from "./useClientVersion";
+} from "./useEpochNumber"
+export { default as useBalance } from "./useBalance"
+export { useEpochNumber, useEpochNumberFn }
+export { default as useSWR, useEpochNumberSWR } from "./swr"
+export { default as initContract } from "./initContract"
+export { default as useConfluxJSDefined } from "./useConfluxJSDefined"
+export { default as useStatus } from "./useStatus"
+export { default as useConfirmationRiskByHash } from "./useConfirmationRiskByHash"
+export { default as useClientVersion } from "./useClientVersion"
 
-import * as shuttleFlow from "./shuttleflow";
-export { shuttleFlow };
+export { default as Big } from "big.js"
 
-export { default as Big } from "big.js";
-
-setupEpochListener();
+setupEpochListener()

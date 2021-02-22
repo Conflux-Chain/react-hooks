@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState } from "react"
 import {
   useStatus,
   useEpochNumber,
@@ -7,12 +7,12 @@ import {
   useConfirmationRiskByHash,
   useClientVersion,
   Big,
-} from "../src";
-import ConfluxJSDefinedUI from "./ConfluxJSDefinedUI";
+} from "../src"
+import ConfluxJSDefinedUI from "./ConfluxJSDefinedUI"
 
 export default {
   title: "General",
-};
+}
 
 const UseConfluxPortalTemplate = () => {
   const {
@@ -22,15 +22,15 @@ const UseConfluxPortalTemplate = () => {
     login,
     useEnsurePortalLogin,
   } = useConfluxPortal([
-    "0x8e2f2e68eb75bb8b18caafe9607242d4748f8d98", // fc contract address
-    "0x86d2fb177eff4be03a342951269096265b98ac46", // ceth contract address
-  ]);
+    "CFX:TYPE.CONTRACT:ACHC8NXJ7R451C223M18W2DWJNMHKD6RXAWRVKVSY2", // fc contract address
+    "CFX:TYPE.CONTRACT:ACDRF821T59Y12B4GUYZCKYUW2XF1GFPJ2BA0X4SJ6", // ceth contract address
+  ])
 
-  useEnsurePortalLogin();
-  const loggedIn = Boolean(address);
+  useEnsurePortalLogin()
+  const loggedIn = Boolean(address)
   const [fcBalance, cethBalance] = tokenBalances.map((b) =>
     (Big(b) / 1e18).toString()
-  );
+  )
 
   return (
     <>
@@ -51,31 +51,31 @@ const UseConfluxPortalTemplate = () => {
       </button>
       <ConfluxJSDefinedUI />
     </>
-  );
-};
+  )
+}
 
-export const UseConfluxPortal = UseConfluxPortalTemplate.bind({});
+export const UseConfluxPortal = UseConfluxPortalTemplate.bind({})
 
 const UseEpochNumberTemplate = () => {
-  const epochNumber = useEpochNumber();
+  const epochNumber = useEpochNumber()
 
   return (
     <>
       <p>epochNumber: {epochNumber}</p>
       <ConfluxJSDefinedUI />
     </>
-  );
-};
+  )
+}
 
-export const UseEpochNumber = UseEpochNumberTemplate.bind({});
+export const UseEpochNumber = UseEpochNumberTemplate.bind({})
 
 const UseBalanceTemplate = () => {
-  const userAddr = "0x1202894ac930192145a0904daed5e21333115744";
+  const userAddr = "CFX:TYPE.USER:AAKAFCMM3E2BWJMFYCJE5N0Z6JKXGEM1JUDWDH32JZ"
   const tokenAddrs = [
-    "0x8e2f2e68eb75bb8b18caafe9607242d4748f8d98", // fc contract address
-    "0x86d2fb177eff4be03a342951269096265b98ac46", // ceth contract address
-  ];
-  const [balance, [fcBalance, cethBalance]] = useBalance(userAddr, tokenAddrs);
+    "CFX:TYPE.CONTRACT:ACHC8NXJ7R451C223M18W2DWJNMHKD6RXAWRVKVSY2", // fc contract address
+    "CFX:TYPE.CONTRACT:ACDRF821T59Y12B4GUYZCKYUW2XF1GFPJ2BA0X4SJ6", // ceth contract address
+  ]
+  const [balance, [fcBalance, cethBalance]] = useBalance(userAddr, tokenAddrs)
 
   return (
     <>
@@ -84,32 +84,32 @@ const UseBalanceTemplate = () => {
       <p>cETH Balance: {(Big(cethBalance) / 1e18).toString()} cETH</p>
       <ConfluxJSDefinedUI />
     </>
-  );
-};
+  )
+}
 
-export const UseBalance = UseBalanceTemplate.bind({});
+export const UseBalance = UseBalanceTemplate.bind({})
 
 const UseStatusTemplate = () => {
-  const status = useStatus();
+  const status = useStatus()
 
   return (
     <>
       <p>Status: {JSON.stringify(status)} CFX</p>
       <ConfluxJSDefinedUI />
     </>
-  );
-};
+  )
+}
 
-export const UseStatus = UseStatusTemplate.bind({});
+export const UseStatus = UseStatusTemplate.bind({})
 
 const UseConfirmationRiskTemplate = () => {
-  const [resetCount, setResetCount] = useState(1);
-  const status = useStatus();
+  const [resetCount, setResetCount] = useState(1)
+  const status = useStatus()
   const currentBlockHash = useMemo(() => status?.bestHash, [
     Boolean(status?.bestHash),
     resetCount,
-  ]);
-  const risk = useConfirmationRiskByHash(currentBlockHash);
+  ])
+  const risk = useConfirmationRiskByHash(currentBlockHash)
 
   return (
     <>
@@ -120,14 +120,14 @@ const UseConfirmationRiskTemplate = () => {
       </button>
       <ConfluxJSDefinedUI />
     </>
-  );
-};
+  )
+}
 
-export const UseConfirmationRisk = UseConfirmationRiskTemplate.bind({});
+export const UseConfirmationRisk = UseConfirmationRiskTemplate.bind({})
 
 const UseClientVersionTemplate = () => {
-  console.log(useClientVersion());
-  const clientVersion = useClientVersion();
+  console.log(useClientVersion())
+  const clientVersion = useClientVersion()
 
   return (
     <>
@@ -135,7 +135,7 @@ const UseClientVersionTemplate = () => {
       <br />
       <ConfluxJSDefinedUI />
     </>
-  );
-};
+  )
+}
 
-export const UseClientVersion = UseClientVersionTemplate.bind({});
+export const UseClientVersion = UseClientVersionTemplate.bind({})
