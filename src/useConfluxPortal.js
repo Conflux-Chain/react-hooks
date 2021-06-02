@@ -6,7 +6,7 @@ import { useBalance } from "./";
 export const UPDATE_CHAINID_SWR_ID = "UPDATE_CHAINID_SWR_ID";
 
 function openHomePage() {
-  window.open("https://portal.conflux-chain.org");
+  window.open("https://portal.confluxnetwork.org");
 }
 
 function validAddresses(addresses) {
