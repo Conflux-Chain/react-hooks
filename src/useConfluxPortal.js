@@ -36,6 +36,7 @@ export default function useConfluxPortal(tokenAddrs = []) {
       : null
   );
   const [chainId, setChainId] = useState(window?.conflux?.chainId);
+  const [error,setError]=useState(null)
 
   useEffectOnce(() => {
     window?.conflux?.send({ method: "cfx_accounts" }).then((accounts) => {
@@ -60,12 +61,15 @@ export default function useConfluxPortal(tokenAddrs = []) {
 
   const login = (fallbackFn) => {
     if (!address) {
-      if (window?.conflux?.enable)
+      if (window?.conflux)
         return window.conflux
-          .enable()
+          .send('cfx_requestAccounts')
           .then(
             (addresses) => validAddresses(addresses) && setAddress(addresses[0])
-          );
+          )
+          .catch(
+            (error)=>setError(error)
+          )
       return typeof fallbackFn === "function" && fallbackFn();
     }
   };
@@ -107,6 +111,7 @@ export default function useConfluxPortal(tokenAddrs = []) {
     address,
     balances: [balance, tokenBalances],
     chainId,
+    error,
     login,
     useEnsurePortalLogin,
     conflux: window?.conflux,
