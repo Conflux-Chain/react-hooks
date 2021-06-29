@@ -5,10 +5,12 @@ import initContract from "./initContract";
 
 export const UPDATE_USER_BALANCE_SWR_ID = "UPDATE_USER_BALANCE_SWR_ID";
 
+let CONTRACT_INITIATED_WITH_CFX_INSTANCE = Boolean(window?.confluxJS)
+
 let c = initContract({
   abi: SINGLE_CALL_BALANCES_ABI,
   address: "0x8f35930629fce5b5cf4cd762e71006045bfeb24d",
-});
+}, window?.confluxJS);
 
 function getTokensBalance(userAddr, tokenAddrs) {
   return c
@@ -22,11 +24,18 @@ function getTokensBalance(userAddr, tokenAddrs) {
 export default function useBalance(userAddr, tokenAddrs) {
   const confluxJSDefined = useConfluxJSDefined();
   useEffect(() => {
-    if (confluxJSDefined && !c) {
+    if (!confluxJSDefined) return
+    if (c) {
+      if (!CONTRACT_INITIATED_WITH_CFX_INSTANCE) {
+        c._feedAddressNetId(SINGLE_CALL_BALANCES_ABI, window.confluxJS)
+        CONTRACT_INITIATED_WITH_CFX_INSTANCE = true
+      }
+    } else {
       c = initContract({
         abi: SINGLE_CALL_BALANCES_ABI,
         address: "0x8f35930629fce5b5cf4cd762e71006045bfeb24d",
-      });
+      }, window.confluxJS);
+      CONTRACT_INITIATED_WITH_CFX_INSTANCE = true
     }
   }, [confluxJSDefined]);
 
