@@ -1,11 +1,10 @@
 import SINGLE_CALL_BALANCES_ABI from "./contracts/cfx-single-call-balance-checker-abi.json";
 import { useEffect } from "react";
 import { useConfluxJSDefined, useEpochNumberSWR } from "./";
+import { useChainNetId } from './';
 import initContract from "./initContract";
 
 export const UPDATE_USER_BALANCE_SWR_ID = "UPDATE_USER_BALANCE_SWR_ID";
-
-let CONTRACT_INITIATED_WITH_CFX_INSTANCE = Boolean(window?.confluxJS)
 
 let c = initContract({
   abi: SINGLE_CALL_BALANCES_ABI,
@@ -14,30 +13,28 @@ let c = initContract({
 
 function getTokensBalance(userAddr, tokenAddrs) {
   return c
-    ?.balances(
-      [userAddr],
-      ["0x0000000000000000000000000000000000000000", ...tokenAddrs]
-    )
-    ?.call();
+  ?.balances(
+    [userAddr],
+    ["0x0000000000000000000000000000000000000000", ...tokenAddrs]
+  )
+  ?.call();
 }
 
 export default function useBalance(userAddr, tokenAddrs) {
   const confluxJSDefined = useConfluxJSDefined();
+  const {chainId} = useChainNetId()
+
   useEffect(() => {
-    if (!confluxJSDefined) return
+    if (!confluxJSDefined || !chainId) return
     if (c) {
-      if (!CONTRACT_INITIATED_WITH_CFX_INSTANCE) {
-        c._feedAddressNetId(SINGLE_CALL_BALANCES_ABI, window.confluxJS)
-        CONTRACT_INITIATED_WITH_CFX_INSTANCE = true
-      }
+      c._feedAddressNetId(SINGLE_CALL_BALANCES_ABI, window.confluxJS)
     } else {
       c = initContract({
         abi: SINGLE_CALL_BALANCES_ABI,
         address: "0x8f35930629fce5b5cf4cd762e71006045bfeb24d",
       }, window.confluxJS);
-      CONTRACT_INITIATED_WITH_CFX_INSTANCE = true
     }
-  }, [confluxJSDefined]);
+  }, [confluxJSDefined, Boolean(chainId)]);
 
   const {
     data: [balance, ...tokenBalances],

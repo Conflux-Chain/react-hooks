@@ -2,8 +2,7 @@ import { useState } from "react";
 import { useEffectOnce } from "react-use";
 import { useConfluxJSDefined, useSWR } from "./";
 import { useBalance } from "./";
-
-export const UPDATE_CHAINID_SWR_ID = "UPDATE_CHAINID_SWR_ID";
+import { useChainNetId } from './';
 
 function openHomePage() {
   window.open("https://portal.confluxnetwork.org");
@@ -35,7 +34,8 @@ export default function useConfluxPortal(tokenAddrs = []) {
           undefined
       : null
   );
-  const [chainId, setChainId] = useState(window?.conflux?.chainId);
+
+  const {chainId, networkId} = useChainNetId()
   const [error,setError]=useState(null)
 
   useEffectOnce(() => {
@@ -52,12 +52,6 @@ export default function useConfluxPortal(tokenAddrs = []) {
       }
     });
   });
-
-  const { data: swrChainId } = useSWR(UPDATE_CHAINID_SWR_ID, async () =>
-    window?.conflux?.chainId === "loading" ? null : window?.conflux?.chainId
-  );
-
-  if (swrChainId !== chainId) setChainId(swrChainId);
 
   const login = (fallbackFn) => {
     if (!address) {
@@ -95,14 +89,9 @@ export default function useConfluxPortal(tokenAddrs = []) {
         window.localStorage.removeItem("CFXJS_REACT_HOOK_PORTAL_ADDRESS_CACHE");
       }
     };
-    const networkListener = (chainId) => {
-      setChainId(chainId);
-    };
     window?.conflux?.on("accountsChanged", accountListener);
-    window?.conflux?.on("networkChanged", networkListener);
     return () => {
       window?.conflux?.off("accountsChanged", accountListener);
-      window?.conflux?.off("networkChanged", networkListener);
     };
   });
 
@@ -110,6 +99,7 @@ export default function useConfluxPortal(tokenAddrs = []) {
     portalInstalled: Boolean(isPortalInstalled()),
     address,
     balances: [balance, tokenBalances],
+    networkId,
     chainId,
     error,
     login,

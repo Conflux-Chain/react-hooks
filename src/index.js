@@ -12,6 +12,7 @@ export { default as useConfluxJSDefined } from "./useConfluxJSDefined"
 export { default as useStatus } from "./useStatus"
 export { default as useConfirmationRiskByHash } from "./useConfirmationRiskByHash"
 export { default as useClientVersion } from "./useClientVersion"
+export { default as useChainNetId } from './useChainNetId.js'
 
 export { default as Big } from "big.js"
 

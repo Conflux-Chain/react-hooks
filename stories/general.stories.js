@@ -4,6 +4,7 @@ import {
   useEpochNumber,
   useConfluxPortal,
   useBalance,
+  useChainNetId,
   useConfirmationRiskByHash,
   useClientVersion,
   Big,
@@ -21,6 +22,7 @@ const UseConfluxPortalTemplate = () => {
     balances: [cfxBalance, tokenBalances],
     login,
     useEnsurePortalLogin,
+    chainId, networkId,
   } = useConfluxPortal([
     "CFX:TYPE.CONTRACT:ACHC8NXJ7R451C223M18W2DWJNMHKD6RXAWRVKVSY2", // fc contract address
     "CFX:TYPE.CONTRACT:ACDRF821T59Y12B4GUYZCKYUW2XF1GFPJ2BA0X4SJ6", // ceth contract address
@@ -35,6 +37,8 @@ const UseConfluxPortalTemplate = () => {
   return (
     <>
       <p>portalInstalled: {portalInstalled.toString()}</p>
+      <p>chainId: {chainId}</p>
+      <p>networkId: {networkId}</p>
       <p>address: {address}</p>
       <p>CFX balance: {(Big(cfxBalance) / 1e18).toString()} CFX</p>
       <div>
@@ -55,6 +59,22 @@ const UseConfluxPortalTemplate = () => {
 }
 
 export const UseConfluxPortal = UseConfluxPortalTemplate.bind({})
+
+const UseChainNetIdTemplate = () => {
+  const {
+    chainId, networkId,
+  } = useChainNetId()
+
+  return (
+    <>
+      <p>chainId: {chainId}</p>
+      <p>networkId: {networkId}</p>
+      <ConfluxJSDefinedUI />
+    </>
+  )
+}
+
+export const UseChainNetId = UseChainNetIdTemplate.bind({})
 
 const UseEpochNumberTemplate = () => {
   const epochNumber = useEpochNumber()
