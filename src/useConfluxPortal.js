@@ -56,7 +56,7 @@ export default function useConfluxPortal(tokenAddrs = []) {
   const login = async (fallbackFn) => {
     if (!window?.conflux) return
     const hasAddr = !!address && (await window.conflux.send('cfx_accounts')).length
-    if (hasAddr) return
+    if (hasAddr) return typeof fallbackFn === 'function' ? fallbackFn() : undefined
     return window.conflux
       .send('cfx_requestAccounts')
       .then(
