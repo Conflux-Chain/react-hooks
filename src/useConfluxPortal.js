@@ -31,12 +31,12 @@ export default function useConfluxPortal(tokenAddrs = []) {
     // NOTE: if portal is installed, there must be window.conflux here
     window.conflux
       ? window.localStorage.getItem("CFXJS_REACT_HOOK_PORTAL_ADDRESS_CACHE") ||
-          undefined
+      undefined
       : null
   );
 
-  const {chainId, networkId} = useChainNetId()
-  const [error,setError]=useState(null)
+  const { chainId, networkId } = useChainNetId()
+  const [error, setError] = useState(null)
 
   useEffectOnce(() => {
     window?.conflux?.send({ method: "cfx_accounts" }).then((accounts) => {
@@ -53,19 +53,19 @@ export default function useConfluxPortal(tokenAddrs = []) {
     });
   });
 
-  const login = (fallbackFn) => {
-    if (!address) {
-      if (window?.conflux)
-        return window.conflux
-          .send('cfx_requestAccounts')
-          .then(
-            (addresses) => validAddresses(addresses) && setAddress(addresses[0])
-          )
-          .catch(
-            (error)=>setError(error)
-          )
-      return typeof fallbackFn === "function" && fallbackFn();
-    }
+  const login = async (fallbackFn) => {
+    if (!window?.conflux) return
+    const hasAddr = !!address && (await window.conflux.send('cfx_accounts')).length
+    if (hasAddr) return
+    return window.conflux
+      .send('cfx_requestAccounts')
+      .then(
+        (addresses) => validAddresses(addresses) && setAddress(addresses[0])
+      )
+      .catch(
+        (error) => setError(error)
+      )
+    return typeof fallbackFn === "function" && fallbackFn();
   };
 
   const useEnsurePortalLogin = () => {
