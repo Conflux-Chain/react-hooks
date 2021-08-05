@@ -39,6 +39,7 @@ export default function useBalance(userAddr, tokenAddrs) {
   const {
     data: [balance, ...tokenBalances],
     error: balanceErr,
+    isValidating,
   } = useEpochNumberSWR(
     userAddr
       ? [UPDATE_USER_BALANCE_SWR_ID, userAddr, tokenAddrs.toString()]
@@ -49,5 +50,5 @@ export default function useBalance(userAddr, tokenAddrs) {
 
   if (balanceErr) console.error(`Get Balance Error: ${balanceErr.message}`);
 
-  return [balance, tokenBalances];
+  return [balance, tokenBalances, isValidating];
 }
