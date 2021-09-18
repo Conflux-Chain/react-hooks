@@ -1,3 +1,5 @@
 /node_modules/
 /storybook-static/
 /lib/
+/test/gatsby/node_modules
+/test/gatsby/public
