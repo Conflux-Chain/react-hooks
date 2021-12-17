@@ -34,7 +34,7 @@ export default function useBalance(userAddr, tokenAddrs) {
 
   useEffect(() => {
     if (!confluxJSDefined || !chainId) return
-    if (c) {
+    if (c && c._feedAddressNetId) {
       c._feedAddressNetId(SINGLE_CALL_BALANCES_ABI, window.confluxJS)
     } else {
       c = initContract(
