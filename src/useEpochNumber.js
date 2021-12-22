@@ -17,6 +17,8 @@ function dispatchEpochNumberUpdated() {
     if (EPOCH_NUMBER_UPDATED_EVENT_DATA.detail === epochNumber) return
     EPOCH_NUMBER_UPDATED_EVENT_DATA.detail = epochNumber
     window.dispatchEvent(EPOCH_NUMBER_UPDATED_EVENT)
+  }).catch(error=>{
+    console.warn(error)
   })
 }
 
